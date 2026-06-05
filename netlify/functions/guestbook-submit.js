@@ -42,9 +42,10 @@ exports.handler = async (event) => {
   }
 
   const { error } = await supabase.from('guestbook').insert({
-    name:    name.trim().slice(0, 80),
-    message: message.trim().slice(0, 500),
-    url:     url?.trim().slice(0, 200) || null,
+    name:     name.trim().slice(0, 80),
+    message:  message.trim().slice(0, 500),
+    url:      url?.trim().slice(0, 200) || null,
+    location: location?.trim().slice(0, 100) || null,
     approved: true,
   })
 
