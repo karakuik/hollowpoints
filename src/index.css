@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #09090f;
+    color: #e8eaf0;
+  }
+}
+
+/* rehype-pretty-code: fenced code blocks */
+[data-rehype-pretty-code-figure] pre {
+  @apply my-6 rounded-lg px-0 py-4 text-sm leading-6 overflow-x-auto bg-hp-surface border border-hp-border;
+}
+
+[data-rehype-pretty-code-figure] code [data-line] {
+  @apply px-4;
+}
+
+/* inline code */
+:not(pre) > code {
+  @apply bg-hp-surface text-hp-text rounded px-1.5 py-0.5 text-sm font-mono border border-hp-border;
+}
