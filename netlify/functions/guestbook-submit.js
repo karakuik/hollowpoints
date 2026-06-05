@@ -45,7 +45,7 @@ exports.handler = async (event) => {
     name:    name.trim().slice(0, 80),
     message: message.trim().slice(0, 500),
     url:     url?.trim().slice(0, 200) || null,
-    approved: false,
+    approved: true,
   })
 
   if (error) return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: error.message }) }
