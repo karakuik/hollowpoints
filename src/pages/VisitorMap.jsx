@@ -5,8 +5,8 @@ import 'leaflet/dist/leaflet.css'
 import Nav from '../components/Nav'
 import Meta from '../components/Meta'
 import { supabase } from '../lib/supabase'
+import { pinColor } from '../lib/pinColors'
 
-// ── custom pin icon ────────────────────────────────────────────────────────────
 function makePinIcon(color, size = 10) {
   return L.divIcon({
     className: '',
@@ -23,8 +23,7 @@ function makePinIcon(color, size = 10) {
   })
 }
 
-const PIN_ICON     = makePinIcon('#ff4500')
-const NEW_PIN_ICON = makePinIcon('#ff4500', 14)
+const NEW_PIN_ICON = makePinIcon('#ffffff', 14)
 
 // ── click-to-drop layer ────────────────────────────────────────────────────────
 function DropLayer({ active, onDrop }) {
@@ -161,7 +160,7 @@ export default function VisitorMap() {
 
           {/* Existing pins */}
           {pins.map(pin => (
-            <Marker key={pin.id} position={[pin.lat, pin.lng]} icon={PIN_ICON}>
+            <Marker key={pin.id} position={[pin.lat, pin.lng]} icon={makePinIcon(pinColor(pin.id))}>
               {pin.label && (
                 <Popup className="hp-popup">
                   <span style={{ color: '#e8eaf0', fontSize: '12px', fontWeight: 600 }}>

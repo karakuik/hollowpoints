@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import Layout from '../components/Layout'
 import Meta from '../components/Meta'
 import { supabase } from '../lib/supabase'
+
+const PinMap = lazy(() => import('../components/PinMap'))
 
 function EntryCard({ entry }) {
   return (
@@ -15,9 +16,14 @@ function EntryCard({ entry }) {
             </a>
           ) : entry.name}
         </span>
-        <span className="text-[10px] text-hp-muted flex-shrink-0">
-          {new Date(entry.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-        </span>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {entry.location && (
+            <span className="text-[10px] text-hp-muted/60">📍 {entry.location}</span>
+          )}
+          <span className="text-[10px] text-hp-muted">
+            {new Date(entry.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          </span>
+        </div>
       </div>
       <p className="text-sm text-hp-text/70 leading-relaxed">{entry.message}</p>
     </div>
@@ -28,22 +34,37 @@ export default function Guestbook() {
   const [submitted,  setSubmitted]  = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [entries,    setEntries]    = useState([])
+  const [pins,       setPins]       = useState([])
   const [loading,    setLoading]    = useState(true)
 
   useEffect(() => {
-    supabase
-      .from('guestbook')
-      .select('id,name,message,url,created_at')
-      .eq('approved', true)
-      .order('created_at', { ascending: false })
-      .then(({ data }) => { if (data) setEntries(data); setLoading(false) })
+    Promise.all([
+      supabase
+        .from('guestbook')
+        .select('id,name,message,url,location,created_at')
+        .eq('approved', true)
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('visitor_pins')
+        .select('id,lat,lng,label,created_at')
+        .order('created_at', { ascending: false }),
+    ]).then(([{ data: g }, { data: p }]) => {
+      if (g) setEntries(g)
+      if (p) setPins(p)
+      setLoading(false)
+    })
   }, [])
 
   async function handleSubmit(e) {
     e.preventDefault()
     setSubmitting(true)
     const fd = new FormData(e.target)
-    const body = { name: fd.get('name'), message: fd.get('message'), url: fd.get('url') }
+    const body = {
+      name:     fd.get('name'),
+      message:  fd.get('message'),
+      url:      fd.get('url'),
+      location: fd.get('location'),
+    }
 
     try {
       const res = await fetch('/.netlify/functions/guestbook-submit', {
@@ -51,8 +72,17 @@ export default function Guestbook() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-      if (res.ok) setSubmitted(true)
-      else alert('Something went wrong — try again.')
+      if (res.ok) {
+        setSubmitted(true)
+        // Refresh pins in case a new one was geocoded
+        supabase
+          .from('visitor_pins')
+          .select('id,lat,lng,label,created_at')
+          .order('created_at', { ascending: false })
+          .then(({ data }) => { if (data) setPins(data) })
+      } else {
+        alert('Something went wrong — try again.')
+      }
     } catch {
       alert('Something went wrong — try again.')
     } finally {
@@ -64,24 +94,33 @@ export default function Guestbook() {
     <Layout>
       <Meta title="Guestbook" description="Leave a note. Say hi." />
 
-      <div className="mb-10">
+      <div className="mb-8">
         <p className="text-hp-accent text-xs font-semibold uppercase tracking-widest mb-2">Community</p>
-        <div className="flex items-end justify-between gap-4 flex-wrap">
-          <div>
-            <h1 className="text-4xl font-bold text-hp-text">Guestbook</h1>
-            <p className="text-hp-muted text-sm mt-3">Leave a note. Say hi. Tell me what you're running this season.</p>
-          </div>
-          <Link
-            to="/map"
-            className="text-xs text-hp-muted hover:text-hp-accent border border-hp-border hover:border-hp-accent/40 px-3 py-1.5 rounded transition-colors flex-shrink-0"
-          >
-            📍 Visitor map →
-          </Link>
-        </div>
+        <h1 className="text-4xl font-bold text-hp-text">Guestbook</h1>
+        <p className="text-hp-muted text-sm mt-2">
+          Leave a note. Drop a pin. {pins.length > 0 && `${pins.length} visitors from around the world.`}
+        </p>
       </div>
 
+      {/* Map */}
+      <div className="rounded-xl overflow-hidden border border-hp-border mb-8">
+        {loading ? (
+          <div className="bg-hp-surface flex items-center justify-center" style={{ height: '42vh' }}>
+            <span className="text-hp-muted text-sm">Loading map…</span>
+          </div>
+        ) : (
+          <Suspense fallback={
+            <div className="bg-hp-surface flex items-center justify-center" style={{ height: '42vh' }}>
+              <span className="text-hp-muted text-sm">Loading map…</span>
+            </div>
+          }>
+            <PinMap pins={pins} height="42vh" />
+          </Suspense>
+        )}
+      </div>
+
+      {/* Form + Entries */}
       <div className="grid sm:grid-cols-2 gap-8 items-start">
-        {/* Form */}
         <div>
           {submitted ? (
             <div className="bg-hp-surface border border-green-500/20 rounded-xl p-8 text-center">
@@ -113,14 +152,26 @@ export default function Guestbook() {
                   className="w-full bg-hp-bg border border-hp-border rounded-lg px-4 py-2.5 text-sm text-hp-text placeholder:text-hp-muted focus:outline-none focus:border-hp-accent transition-colors resize-none"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-hp-muted uppercase tracking-wider mb-1.5">
-                  Website <span className="font-normal normal-case text-hp-muted">(optional)</span>
-                </label>
-                <input
-                  type="url" name="url" placeholder="https://..."
-                  className="w-full bg-hp-bg border border-hp-border rounded-lg px-4 py-2.5 text-sm text-hp-text placeholder:text-hp-muted focus:outline-none focus:border-hp-accent transition-colors"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-hp-muted uppercase tracking-wider mb-1.5">
+                    Location <span className="font-normal normal-case text-hp-muted">(optional)</span>
+                  </label>
+                  <input
+                    type="text" name="location" maxLength={100}
+                    placeholder="City, country…"
+                    className="w-full bg-hp-bg border border-hp-border rounded-lg px-4 py-2.5 text-sm text-hp-text placeholder:text-hp-muted focus:outline-none focus:border-hp-accent transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-hp-muted uppercase tracking-wider mb-1.5">
+                    Website <span className="font-normal normal-case text-hp-muted">(optional)</span>
+                  </label>
+                  <input
+                    type="url" name="url" placeholder="https://…"
+                    className="w-full bg-hp-bg border border-hp-border rounded-lg px-4 py-2.5 text-sm text-hp-text placeholder:text-hp-muted focus:outline-none focus:border-hp-accent transition-colors"
+                  />
+                </div>
               </div>
               <button
                 type="submit" disabled={submitting}
@@ -128,12 +179,13 @@ export default function Guestbook() {
               >
                 {submitting ? 'Sending…' : 'Sign guestbook →'}
               </button>
-              <p className="text-hp-muted/40 text-xs text-center">Reviewed before appearing publicly.</p>
+              <p className="text-hp-muted/40 text-xs text-center">
+                Reviewed before appearing publicly. Location pins the map automatically.
+              </p>
             </form>
           )}
         </div>
 
-        {/* Entries */}
         <div>
           {loading ? (
             <p className="text-hp-muted text-sm">Loading entries…</p>
