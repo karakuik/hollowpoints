@@ -9,6 +9,12 @@ const projects = [
     to: '/pokedex',
     tags: ['React', 'Data', 'Pokémon'],
   },
+  {
+    name: 'GSC Team Builder',
+    description: 'Build and analyze your Gen 2 team — offensive STAB coverage, defensive weakness heatmap, and composition insights.',
+    to: '/team-builder',
+    tags: ['React', 'Tool', 'Pokémon'],
+  },
 ]
 
 export default function Projects() {

@@ -18,7 +18,43 @@ function sortPosts(list, sort) {
   return copy
 }
 
-function FeaturedCard({ post }) {
+function TagChip({ tag, active, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
+        active
+          ? 'bg-hp-accent/15 text-hp-accent border-hp-accent/40'
+          : 'bg-hp-surface border-hp-border text-hp-muted hover:text-hp-text hover:border-hp-border/80'
+      }`}
+    >
+      #{tag}
+    </button>
+  )
+}
+
+function PostTags({ tags, activeTag, onTag }) {
+  if (!tags?.length) return null
+  return (
+    <div className="flex flex-wrap gap-1 mt-2" onClick={e => e.preventDefault()}>
+      {tags.map(tag => (
+        <button
+          key={tag}
+          onClick={() => onTag(tag)}
+          className={`text-[10px] px-2 py-0.5 rounded-full border transition-colors ${
+            activeTag === tag
+              ? 'bg-hp-accent/15 text-hp-accent border-hp-accent/30'
+              : 'bg-transparent border-hp-border text-hp-muted hover:text-hp-text'
+          }`}
+        >
+          #{tag}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function FeaturedCard({ post, label, activeTag, onTag }) {
   return (
     <Link
       to={`/blog/${post.slug}`}
@@ -26,12 +62,13 @@ function FeaturedCard({ post }) {
                  hover:border-hp-accent/50 transition-all duration-300
                  hover:shadow-[0_0_40px_rgba(255,69,0,0.08)]"
     >
-      {/* subtle accent gradient wash */}
       <div className="absolute inset-0 bg-gradient-to-br from-hp-accent/[0.04] via-transparent to-transparent pointer-events-none" />
 
-      <p className="relative text-hp-accent text-xs font-semibold uppercase tracking-widest mb-4">
-        Latest Post
-      </p>
+      {label && (
+        <p className="relative text-hp-accent text-xs font-semibold uppercase tracking-widest mb-4">
+          {label}
+        </p>
+      )}
       <h2 className="relative text-2xl sm:text-3xl font-bold text-hp-text group-hover:text-hp-accent transition-colors duration-200 leading-snug mb-3">
         {post.title}
       </h2>
@@ -41,6 +78,7 @@ function FeaturedCard({ post }) {
           {post.description}
         </p>
       )}
+      <PostTags tags={post.tags} activeTag={activeTag} onTag={onTag} />
       <p className="relative mt-5 text-xs font-semibold text-hp-accent opacity-0 group-hover:opacity-100 transition-opacity duration-200 uppercase tracking-wider">
         Read post →
       </p>
@@ -48,7 +86,7 @@ function FeaturedCard({ post }) {
   )
 }
 
-function GlowCard({ post }) {
+function GlowCard({ post, activeTag, onTag }) {
   return (
     <Link
       to={`/blog/${post.slug}`}
@@ -64,31 +102,39 @@ function GlowCard({ post }) {
           {post.description}
         </p>
       )}
+      <PostTags tags={post.tags} activeTag={activeTag} onTag={onTag} />
       <p className="text-xs text-hp-muted mt-3 pt-3 border-t border-hp-border">{post.date}</p>
     </Link>
   )
 }
 
 export default function Blog() {
-  const [query, setQuery] = useState('')
-  const [sort, setSort]   = useState('newest')
+  const [query,     setQuery]     = useState('')
+  const [sort,      setSort]      = useState('newest')
+  const [activeTag, setActiveTag] = useState(null)
+
+  const allTags = useMemo(() => {
+    const tagSet = new Set(posts.flatMap(p => p.tags || []))
+    return [...tagSet].sort()
+  }, [])
 
   const visiblePosts = useMemo(() => {
     const q = query.trim().toLowerCase()
-    const filtered = q
-      ? posts.filter(
-          p =>
-            p.title?.toLowerCase().includes(q) ||
-            p.description?.toLowerCase().includes(q)
-        )
+    let filtered = q
+      ? posts.filter(p => p.title?.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q))
       : posts
+    if (activeTag) filtered = filtered.filter(p => p.tags?.includes(activeTag))
     return sortPosts(filtered, sort)
-  }, [query, sort])
+  }, [query, sort, activeTag])
 
-  // Only show the hero featured card on the default unfiltered view
-  const showFeatured = query.trim() === '' && sort === 'newest' && visiblePosts.length > 0
-  const featuredPost = showFeatured ? visiblePosts[0] : null
-  const gridPosts    = showFeatured ? visiblePosts.slice(1) : visiblePosts
+  function toggleTag(tag) {
+    setActiveTag(t => t === tag ? null : tag)
+  }
+
+  const hasPosts      = visiblePosts.length > 0
+  const featuredPost  = hasPosts ? visiblePosts[0] : null
+  const gridPosts     = hasPosts ? visiblePosts.slice(1) : []
+  const featuredLabel = query.trim() === '' && sort === 'newest' && !activeTag ? 'Latest Post' : null
 
   return (
     <Layout>
@@ -99,7 +145,7 @@ export default function Blog() {
         <h1 className="text-4xl font-bold text-hp-text">Blog</h1>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-8">
+      <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <input
           type="search"
           placeholder="Search posts..."
@@ -125,17 +171,45 @@ export default function Blog() {
         </div>
       </div>
 
+      {allTags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-8">
+          {allTags.map(tag => (
+            <TagChip
+              key={tag}
+              tag={tag}
+              active={activeTag === tag}
+              onClick={() => toggleTag(tag)}
+            />
+          ))}
+          {activeTag && (
+            <button
+              onClick={() => setActiveTag(null)}
+              className="text-xs px-2.5 py-1 text-hp-muted hover:text-red-400 transition-colors"
+            >
+              clear ✕
+            </button>
+          )}
+        </div>
+      )}
+
       {visiblePosts.length === 0 ? (
         <p className="text-hp-muted text-sm">No posts match your search.</p>
       ) : (
         <>
-          {featuredPost && <FeaturedCard post={featuredPost} />}
+          {featuredPost && (
+            <FeaturedCard
+              post={featuredPost}
+              label={featuredLabel}
+              activeTag={activeTag}
+              onTag={toggleTag}
+            />
+          )}
 
           {gridPosts.length > 0 && (
             <ul className="grid sm:grid-cols-2 gap-3">
               {gridPosts.map(post => (
                 <li key={post.slug}>
-                  <GlowCard post={post} />
+                  <GlowCard post={post} activeTag={activeTag} onTag={toggleTag} />
                 </li>
               ))}
             </ul>

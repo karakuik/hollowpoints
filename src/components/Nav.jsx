@@ -2,7 +2,8 @@ import { Link, NavLink } from 'react-router-dom'
 
 // Add new projects here — they'll appear in the nav dropdown automatically
 const PROJECT_LINKS = [
-  { to: '/pokedex', label: 'Crystal Pokédex' },
+  { to: '/pokedex',       label: 'Crystal Pokédex' },
+  { to: '/team-builder',  label: 'GSC Team Builder' },
 ]
 
 export default function Nav() {
@@ -59,6 +60,28 @@ export default function Nav() {
               </div>
             </div>
           </div>
+
+          <NavLink
+            to="/now"
+            className={({ isActive }) =>
+              `px-3 py-1.5 text-xs font-semibold uppercase tracking-widest rounded transition-colors ${
+                isActive ? 'text-hp-accent' : 'text-hp-muted hover:text-hp-text'
+              }`
+            }
+          >
+            Now
+          </NavLink>
+
+          <NavLink
+            to="/guestbook"
+            className={({ isActive }) =>
+              `px-3 py-1.5 text-xs font-semibold uppercase tracking-widest rounded transition-colors ${
+                isActive ? 'text-hp-accent' : 'text-hp-muted hover:text-hp-text'
+              }`
+            }
+          >
+            Guestbook
+          </NavLink>
 
           <NavLink
             to="/about"

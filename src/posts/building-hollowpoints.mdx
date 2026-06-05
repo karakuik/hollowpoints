@@ -1,0 +1,30 @@
+---
+title: How I Built This Site
+date: 2026-06-05
+description: Vite, React, MDX, Tailwind — the stack behind hollowpoints.gg and why I chose each piece.
+tags: [dev, meta, react]
+---
+
+I've had a personal website graveyard going back to 2017. Squarespace, then WordPress, then a hand-rolled HTML thing that I was embarrassed of within a month. This time I wanted something I'd actually maintain.
+
+## The stack
+
+**Vite + React** for the shell. I know Next.js is the obvious choice for a blog, but I don't need SSR and I didn't want the framework overhead. Vite's dev experience is fast enough that it genuinely doesn't feel like a compromise.
+
+**MDX** for posts. Writing in Markdown with the option to drop React components in when I need them. The frontmatter gets parsed via `remark-mdx-frontmatter` and becomes a named export — clean enough that I don't think about it.
+
+**Tailwind CSS** for styling. I resisted this for years. Now I'm a convert. The custom `hp.*` color tokens keep the dark theme consistent without a CSS variable file I have to manage separately.
+
+**Netlify** for hosting. Continuous deploy from GitHub, SPA routing via `_redirects`, done.
+
+## Things I didn't do that I'm glad about
+
+No CMS. The thought of setting up Contentful or Sanity for a personal blog is exhausting. MDX files in a `posts/` directory, pushed to git when I write something, is exactly the right level of complexity.
+
+No comment system (yet). I'm thinking about [Giscus](https://giscus.app/) since it's GitHub Discussions under the hood and I won't have to moderate spam.
+
+## What's left
+
+The team builder and Pokédex are the first "real" tools. I want to add Steam integration at some point — show what I'm currently playing on the Now page without having to update it manually.
+
+The honest answer is this site will never be "done." That's the point.
