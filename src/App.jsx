@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Blog from './pages/Blog'
@@ -9,18 +10,22 @@ import TeamBuilder from './pages/TeamBuilder'
 import Now from './pages/Now'
 import Guestbook from './pages/Guestbook'
 
+// Leaflet is large — only load when someone visits /map
+const VisitorMap = lazy(() => import('./pages/VisitorMap'))
+
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/blog" element={<Blog />} />
-      <Route path="/blog/:slug" element={<BlogPost />} />
-      <Route path="/projects" element={<Projects />} />
-      <Route path="/pokedex" element={<Pokedex />} />
+      <Route path="/"            element={<Home />} />
+      <Route path="/blog"        element={<Blog />} />
+      <Route path="/blog/:slug"  element={<BlogPost />} />
+      <Route path="/projects"    element={<Projects />} />
+      <Route path="/pokedex"     element={<Pokedex />} />
       <Route path="/team-builder" element={<TeamBuilder />} />
-      <Route path="/now" element={<Now />} />
-      <Route path="/guestbook" element={<Guestbook />} />
-      <Route path="/about" element={<About />} />
+      <Route path="/now"         element={<Now />} />
+      <Route path="/guestbook"   element={<Guestbook />} />
+      <Route path="/map"         element={<Suspense fallback={null}><VisitorMap /></Suspense>} />
+      <Route path="/about"       element={<About />} />
     </Routes>
   )
 }
