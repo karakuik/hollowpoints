@@ -74,7 +74,7 @@ function PokemonSlot({ index, pokemon, onSelect, onClear }) {
           ${pokemon
             ? 'bg-hp-surface border-hp-border hover:border-hp-accent/50 p-4'
             : 'bg-hp-surface/50 border-dashed border-hp-border hover:border-hp-accent/40 p-4 flex items-center justify-center min-h-[96px]'
-          } ${open ? 'border-hp-accent/60 shadow-[0_0_20px_rgba(255,69,0,0.08)]' : ''}`}
+          } ${open ? 'border-hp-accent/60 glow-accent-slot' : ''}`}
       >
         {pokemon ? (
           <div className="flex flex-col gap-1.5">

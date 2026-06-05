@@ -38,7 +38,7 @@ export default function BlogPost() {
           </h1>
           <p className="text-hp-muted text-sm">{post.date}</p>
         </header>
-        <div className="prose prose-invert [--tw-prose-invert-links:#ff4500] max-w-none">
+        <div className="prose prose-invert [--tw-prose-invert-links:rgb(var(--hp-accent))] max-w-none">
           <PostContent />
         </div>
       </article>

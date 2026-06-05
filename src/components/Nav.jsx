@@ -1,10 +1,69 @@
+import { useRef, useState, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
+import { useTheme, THEMES } from '../lib/theme'
 
 // Add new projects here — they'll appear in the nav dropdown automatically
 const PROJECT_LINKS = [
   { to: '/pokedex',       label: 'Crystal Pokédex' },
   { to: '/team-builder',  label: 'GSC Team Builder' },
 ]
+
+function ThemeSwitcher() {
+  const { theme, setTheme } = useTheme()
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  return (
+    <div ref={ref} className="relative ml-1">
+      <button
+        onClick={() => setOpen(o => !o)}
+        title="Switch theme"
+        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest rounded transition-colors ${
+          open ? 'text-hp-accent' : 'text-hp-muted hover:text-hp-text'
+        }`}
+      >
+        {/* Small accent-colored dot showing current theme */}
+        <span
+          className="w-2 h-2 rounded-full flex-shrink-0 transition-colors"
+          style={{ background: THEMES[theme].dot }}
+        />
+        <span className="hidden sm:inline">{THEMES[theme].label}</span>
+        <svg className="w-2 h-2 opacity-60" fill="currentColor" viewBox="0 0 8 8">
+          <path d="M4 6 L0 2 L8 2 Z" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute top-full right-0 pt-1 z-50">
+          <div className="bg-hp-surface border border-hp-border rounded-lg py-1.5 min-w-36 shadow-lg shadow-black/60">
+            {Object.entries(THEMES).map(([key, { label, dot }]) => (
+              <button
+                key={key}
+                onClick={() => { setTheme(key); setOpen(false) }}
+                className={`w-full flex items-center gap-2.5 px-4 py-2 text-xs transition-colors ${
+                  theme === key
+                    ? 'text-hp-text bg-hp-elevated'
+                    : 'text-hp-muted hover:text-hp-text hover:bg-hp-elevated'
+                }`}
+              >
+                <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: dot }} />
+                {label}
+                {theme === key && <span className="ml-auto text-hp-accent">✓</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function Nav() {
   return (
@@ -93,6 +152,8 @@ export default function Nav() {
           >
             About
           </NavLink>
+
+          <ThemeSwitcher />
         </nav>
       </div>
     </header>

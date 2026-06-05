@@ -8,30 +8,32 @@ export default {
       },
       colors: {
         hp: {
-          bg:       '#09090f', // page background
-          surface:  '#12141c', // nav, cards
-          elevated: '#1c1f2a', // hover/raised state
-          border:   '#252836', // thin borders
-          text:     '#e8eaf0', // primary text
-          muted:    '#6b7280', // secondary / placeholder text
-          accent:   '#ff4500', // orange-red accent
+          // All colors reference CSS variables so themes swap at runtime.
+          // Values are RGB channel triplets (e.g. "9 9 15") so Tailwind's
+          // opacity modifier syntax (bg-hp-accent/20) keeps working.
+          bg:       'rgb(var(--hp-bg)       / <alpha-value>)',
+          surface:  'rgb(var(--hp-surface)  / <alpha-value>)',
+          elevated: 'rgb(var(--hp-elevated) / <alpha-value>)',
+          border:   'rgb(var(--hp-border)   / <alpha-value>)',
+          text:     'rgb(var(--hp-text)     / <alpha-value>)',
+          muted:    'rgb(var(--hp-muted)    / <alpha-value>)',
+          accent:   'rgb(var(--hp-accent)   / <alpha-value>)',
         },
       },
       typography: {
         DEFAULT: {
           css: {
-            // Let rehype-pretty-code own all code block styling
             pre: false,
             code: false,
             'pre code': false,
             'code::before': { content: 'none' },
-            'code::after': { content: 'none' },
+            'code::after':  { content: 'none' },
           },
         },
         invert: {
           css: {
-            '--tw-prose-invert-links': '#ff4500',
-            '--tw-prose-invert-code': '#e8eaf0',
+            '--tw-prose-invert-links': 'rgb(var(--hp-accent))',
+            '--tw-prose-invert-code': 'rgb(var(--hp-text))',
           },
         },
       },

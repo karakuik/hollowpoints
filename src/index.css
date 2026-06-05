@@ -2,14 +2,97 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Theme variables ───────────────────────────────────────────────────────────
+   Values are RGB channel triplets so Tailwind's opacity modifiers work:
+   bg-hp-accent/20 → background-color: rgb(var(--hp-accent) / 0.2)
+   ──────────────────────────────────────────────────────────────────────────── */
 @layer base {
+  :root,
+  [data-theme="dusk"] {
+    --hp-bg:       9 9 15;
+    --hp-surface:  18 20 28;
+    --hp-elevated: 28 31 42;
+    --hp-border:   37 40 54;
+    --hp-text:     232 234 240;
+    --hp-muted:    107 114 128;
+    --hp-accent:   255 69 0;
+  }
+
+  [data-theme="miami-vice"] {
+    --hp-bg:       6 0 16;
+    --hp-surface:  13 0 30;
+    --hp-elevated: 22 0 50;
+    --hp-border:   50 0 90;
+    --hp-text:     242 232 255;
+    --hp-muted:    145 110 185;
+    --hp-accent:   255 45 120;
+  }
+
   body {
-    background-color: #09090f;
-    color: #e8eaf0;
+    background-color: rgb(var(--hp-bg));
+    color: rgb(var(--hp-text));
+  }
+
+  /* Miami Vice: soft pink-to-cyan atmospheric gradient fixed behind everything */
+  [data-theme="miami-vice"] body {
+    background-image:
+      radial-gradient(ellipse 90% 55% at 50% -10%, rgba(255, 45, 120, 0.09) 0%, transparent 65%),
+      radial-gradient(ellipse 90% 40% at 50% 110%, rgba(0, 200, 255, 0.06) 0%, transparent 65%);
+    background-attachment: fixed;
   }
 }
 
-/* rehype-pretty-code: fenced code blocks */
+/* ── Smooth theme crossfade ────────────────────────────────────────────────── */
+.theme-transitioning,
+.theme-transitioning * {
+  transition:
+    background-color  0.3s ease,
+    border-color      0.3s ease,
+    color             0.3s ease,
+    box-shadow        0.3s ease,
+    opacity           0.3s ease !important;
+}
+
+/* ── Theme-aware glow utilities ────────────────────────────────────────────── */
+@layer utilities {
+  /* Used on FeaturedCard hover */
+  .glow-accent-lg {
+    box-shadow: 0 0 40px rgb(var(--hp-accent) / 0.08);
+  }
+  /* Used on GlowCard hover */
+  .glow-accent-sm {
+    box-shadow: 0 0 24px rgb(var(--hp-accent) / 0.07);
+  }
+  /* Used on TeamBuilder slot when open */
+  .glow-accent-slot {
+    box-shadow: 0 0 20px rgb(var(--hp-accent) / 0.09);
+  }
+
+  /* Miami Vice: amplified neon glow */
+  [data-theme="miami-vice"] .glow-accent-lg {
+    box-shadow:
+      0 0 40px rgb(var(--hp-accent) / 0.22),
+      0 0 80px rgb(var(--hp-accent) / 0.08);
+  }
+  [data-theme="miami-vice"] .glow-accent-sm {
+    box-shadow:
+      0 0 24px rgb(var(--hp-accent) / 0.20),
+      0 0 48px rgb(var(--hp-accent) / 0.07);
+  }
+  [data-theme="miami-vice"] .glow-accent-slot {
+    box-shadow:
+      0 0 20px rgb(var(--hp-accent) / 0.20),
+      0 0 40px rgb(var(--hp-accent) / 0.08);
+  }
+
+  /* Miami Vice: neon border glow on focused inputs */
+  [data-theme="miami-vice"] input:focus,
+  [data-theme="miami-vice"] textarea:focus {
+    box-shadow: 0 0 0 1px rgb(var(--hp-accent) / 0.5), 0 0 16px rgb(var(--hp-accent) / 0.12);
+  }
+}
+
+/* ── rehype-pretty-code: fenced code blocks ────────────────────────────────── */
 [data-rehype-pretty-code-figure] pre {
   @apply my-6 rounded-lg px-0 py-4 text-sm leading-6 overflow-x-auto bg-hp-surface border border-hp-border;
 }

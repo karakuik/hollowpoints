@@ -60,7 +60,7 @@ function FeaturedCard({ post, label, activeTag, onTag }) {
       to={`/blog/${post.slug}`}
       className="relative block bg-hp-surface border border-hp-border rounded-xl p-7 mb-6 overflow-hidden group
                  hover:border-hp-accent/50 transition-all duration-300
-                 hover:shadow-[0_0_40px_rgba(255,69,0,0.08)]"
+                 hover:glow-accent-lg"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-hp-accent/[0.04] via-transparent to-transparent pointer-events-none" />
 
@@ -92,7 +92,7 @@ function GlowCard({ post, activeTag, onTag }) {
       to={`/blog/${post.slug}`}
       className="flex flex-col bg-hp-surface border border-hp-border rounded-lg p-5 group
                  hover:border-hp-accent/50 hover:bg-hp-elevated transition-all duration-200
-                 hover:shadow-[0_0_24px_rgba(255,69,0,0.07)]"
+                 hover:glow-accent-sm"
     >
       <h2 className="text-sm font-semibold text-hp-text group-hover:text-hp-accent transition-colors duration-150 leading-snug mb-2">
         {post.title}
