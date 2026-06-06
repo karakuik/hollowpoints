@@ -92,6 +92,29 @@
   }
 }
 
+/* ── Recipes page animations ───────────────────────────────────────────────── */
+@keyframes recipe-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes cat-tab-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ── rehype-pretty-code: fenced code blocks ────────────────────────────────── */
 [data-rehype-pretty-code-figure] pre {
   @apply my-6 rounded-lg px-0 py-4 text-sm leading-6 overflow-x-auto bg-hp-surface border border-hp-border;

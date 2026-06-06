@@ -121,6 +121,17 @@ export default function Nav() {
           </div>
 
           <NavLink
+            to="/recipes"
+            className={({ isActive }) =>
+              `px-3 py-1.5 text-xs font-semibold uppercase tracking-widest rounded transition-colors ${
+                isActive ? 'text-hp-accent' : 'text-hp-muted hover:text-hp-text'
+              }`
+            }
+          >
+            Recipes
+          </NavLink>
+
+          <NavLink
             to="/now"
             className={({ isActive }) =>
               `px-3 py-1.5 text-xs font-semibold uppercase tracking-widest rounded transition-colors ${
