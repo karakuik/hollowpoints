@@ -19,13 +19,34 @@
   }
 
   [data-theme="miami-vice"] {
-    --hp-bg:       6 0 16;
-    --hp-surface:  13 0 30;
-    --hp-elevated: 22 0 50;
-    --hp-border:   50 0 90;
-    --hp-text:     242 232 255;
-    --hp-muted:    145 110 185;
-    --hp-accent:   255 45 120;
+    --hp-bg:       4 0 18;
+    --hp-surface:  10 2 28;
+    --hp-elevated: 18 4 44;
+    --hp-border:   72 20 92;
+    --hp-text:     240 235 255;
+    --hp-muted:    80 160 160;
+    --hp-accent:   248 144 231;
+    --mv-cyan:     11 211 211;
+  }
+
+  [data-theme="matrix"] {
+    --hp-bg:       0 5 1;
+    --hp-surface:  0 12 3;
+    --hp-elevated: 0 22 6;
+    --hp-border:   0 90 25;
+    --hp-text:     180 255 190;
+    --hp-muted:    0 150 50;
+    --hp-accent:   0 255 65;
+  }
+
+  [data-theme="arc-raiders"] {
+    --hp-bg:       10 12 20;
+    --hp-surface:  15 18 30;
+    --hp-elevated: 22 27 44;
+    --hp-border:   140 80 25;
+    --hp-text:     234 224 205;
+    --hp-muted:    90 140 110;
+    --hp-accent:   238 188 28;
   }
 
   body {
@@ -33,13 +54,233 @@
     color: rgb(var(--hp-text));
   }
 
-  /* Miami Vice: soft pink-to-cyan atmospheric gradient fixed behind everything */
   [data-theme="miami-vice"] body {
-    background-image:
-      radial-gradient(ellipse 90% 55% at 50% -10%, rgba(255, 45, 120, 0.09) 0%, transparent 65%),
-      radial-gradient(ellipse 90% 40% at 50% 110%, rgba(0, 200, 255, 0.06) 0%, transparent 65%);
-    background-attachment: fixed;
+    background-color: rgb(4 0 18);
+    position: relative;
+    overflow-x: hidden;
   }
+
+  /* Retrowave sun — yellow-gold to orange, like the reference */
+  [data-theme="miami-vice"] body::before {
+    content: '';
+    position: fixed;
+    bottom: 38%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 360px;
+    height: 180px;
+    border-radius: 360px 360px 0 0;
+    background: linear-gradient(180deg,
+      #ffe600 0%,
+      #ffcc00 20%,
+      #ff9900 55%,
+      #ff5500 85%,
+      #cc2200 100%
+    );
+    mask: repeating-linear-gradient(
+      to bottom,
+      white 0px,
+      white 9px,
+      transparent 9px,
+      transparent 20px
+    );
+    -webkit-mask: repeating-linear-gradient(
+      to bottom,
+      white 0px,
+      white 9px,
+      transparent 9px,
+      transparent 20px
+    );
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 0;
+    animation: sun-pulse 5s ease-in-out infinite;
+  }
+
+  /* Retrowave perspective grid floor */
+  /* mask: top 18% fades to transparent so horizon lines dissolve instead of flashing */
+  [data-theme="miami-vice"] body::after {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) perspective(400px) rotateX(55deg);
+    transform-origin: bottom center;
+    width: 220%;
+    height: 55vh;
+    background-image:
+      repeating-linear-gradient(
+        to bottom,
+        rgba(11, 211, 211, 0.25) 0px,
+        rgba(11, 211, 211, 0.25) 1px,
+        transparent 1px,
+        transparent 40px
+      ),
+      repeating-linear-gradient(
+        to right,
+        rgba(248, 144, 231, 0.2) 0px,
+        rgba(248, 144, 231, 0.2) 1px,
+        transparent 1px,
+        transparent 60px
+      );
+    background-size: 100% 40px, 60px 100%;
+    mask: linear-gradient(to bottom, transparent 0%, black 38%, black 100%);
+    -webkit-mask: linear-gradient(to bottom, transparent 0%, black 38%, black 100%);
+    pointer-events: none;
+    z-index: 0;
+    animation: grid-scroll 4s linear infinite;
+  }
+
+  /* Matrix: CRT scanlines */
+  [data-theme="matrix"] body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(0, 255, 65, 0.025) 3px,
+      rgba(0, 255, 65, 0.025) 4px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Matrix: digital rain cascade */
+  [data-theme="matrix"] body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      /* vertical column separators */
+      repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 23px,
+        rgba(0, 255, 65, 0.05) 23px,
+        rgba(0, 255, 65, 0.05) 24px
+      ),
+      /* rain drips: bright head → fading tail per row */
+      repeating-linear-gradient(
+        to bottom,
+        transparent         0px,
+        transparent         22px,
+        rgba(0,255,65,0.03) 22px,
+        rgba(0,255,65,0.07) 26px,
+        rgba(0,255,65,0.16) 28px,
+        rgba(0,255,65,0.22) 30px,
+        rgba(0,255,65,0.08) 31px,
+        rgba(0,255,65,0.02) 33px,
+        transparent         36px
+      );
+    background-size: 24px 100%, 100% 36px;
+    animation: matrix-fall 2.8s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Matrix: radial green glow from center */
+  [data-theme="matrix"] body {
+    background-image: radial-gradient(
+      ellipse 70% 50% at 50% 40%,
+      rgba(0, 255, 65, 0.04) 0%,
+      transparent 70%
+    );
+  }
+
+  /* Arc Raiders body base */
+  [data-theme="arc-raiders"] body {
+    background-color: rgb(10 12 20);
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Raiders: 4 crisp neon-tube bands — tight 4px glow, 24px dark gaps, no blur */
+  [data-theme="arc-raiders"] body::before {
+    content: '';
+    position: fixed;
+    top: -15vh;
+    left: -60px;
+    width: 260px;
+    height: 130vh;
+    background: linear-gradient(
+      to right,
+      transparent              0px,
+      /* ── Cyan ── core 16-44px */
+      rgba(0,255,255,0.15)    10px,
+      rgba(0,255,255,0.75)    13px,
+      #00FFFF                 16px,
+      #00FFFF                 44px,
+      rgba(0,255,255,0.75)    47px,
+      rgba(0,255,255,0.15)    50px,
+      /* 24px dark gap: 50→74 */
+      transparent              54px,
+      /* ── Green ── core 78-106px */
+      rgba(0,255,0,0.15)      74px,
+      rgba(0,255,0,0.75)      77px,
+      #00FF00                  78px,
+      #00FF00                 106px,
+      rgba(0,255,0,0.75)      109px,
+      rgba(0,255,0,0.15)      112px,
+      /* 24px dark gap: 112→136 */
+      transparent             116px,
+      /* ── Yellow ── core 140-168px */
+      rgba(255,255,0,0.15)    136px,
+      rgba(255,255,0,0.75)    139px,
+      #FFFF00                 140px,
+      #FFFF00                 168px,
+      rgba(255,255,0,0.75)    171px,
+      rgba(255,255,0,0.15)    174px,
+      /* 24px dark gap: 174→198 */
+      transparent             178px,
+      /* ── Red ── core 202-230px */
+      rgba(255,0,0,0.15)      198px,
+      rgba(255,0,0,0.75)      201px,
+      #FF0000                 202px,
+      #FF0000                 230px,
+      rgba(255,0,0,0.75)      233px,
+      rgba(255,0,0,0.15)      236px,
+      transparent             240px,
+      transparent             260px
+    );
+    transform: rotate(-9deg);
+    transform-origin: center;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Arc Raiders: subtle CRT scanlines for that analog display feel */
+  [data-theme="arc-raiders"] body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(234,224,205,0.012) 3px,
+      rgba(234,224,205,0.012) 4px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+/* ── Miami Vice retrowave animations ───────────────────────────────────────── */
+@keyframes sun-pulse {
+  0%, 100% { opacity: 0.55; filter: drop-shadow(0 0 20px rgba(255,180,0,0.6)); }
+  50%       { opacity: 0.70; filter: drop-shadow(0 0 40px rgba(255,230,0,0.5)); }
+}
+
+@keyframes grid-scroll {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 0 40px, 0 0; }
+}
+
+@keyframes matrix-fall {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 0 0, 0 36px; }
 }
 
 /* ── Smooth theme crossfade ────────────────────────────────────────────────── */
@@ -68,27 +309,93 @@
     box-shadow: 0 0 20px rgb(var(--hp-accent) / 0.09);
   }
 
-  /* Miami Vice: amplified neon glow */
+  /* Miami Vice: dual neon glow (pink + cyan) */
   [data-theme="miami-vice"] .glow-accent-lg {
     box-shadow:
-      0 0 40px rgb(var(--hp-accent) / 0.22),
-      0 0 80px rgb(var(--hp-accent) / 0.08);
+      0 0 40px rgb(var(--hp-accent) / 0.30),
+      0 0 80px rgb(var(--hp-accent) / 0.12),
+      0 0 60px rgb(var(--mv-cyan) / 0.10);
   }
   [data-theme="miami-vice"] .glow-accent-sm {
     box-shadow:
-      0 0 24px rgb(var(--hp-accent) / 0.20),
-      0 0 48px rgb(var(--hp-accent) / 0.07);
+      0 0 24px rgb(var(--hp-accent) / 0.28),
+      0 0 48px rgb(var(--hp-accent) / 0.10),
+      0 0 32px rgb(var(--mv-cyan) / 0.08);
   }
   [data-theme="miami-vice"] .glow-accent-slot {
     box-shadow:
-      0 0 20px rgb(var(--hp-accent) / 0.20),
-      0 0 40px rgb(var(--hp-accent) / 0.08);
+      0 0 20px rgb(var(--hp-accent) / 0.28),
+      0 0 40px rgb(var(--mv-cyan) / 0.12);
   }
 
   /* Miami Vice: neon border glow on focused inputs */
   [data-theme="miami-vice"] input:focus,
   [data-theme="miami-vice"] textarea:focus {
-    box-shadow: 0 0 0 1px rgb(var(--hp-accent) / 0.5), 0 0 16px rgb(var(--hp-accent) / 0.12);
+    box-shadow:
+      0 0 0 1px rgb(var(--hp-accent) / 0.6),
+      0 0 16px rgb(var(--hp-accent) / 0.18),
+      0 0 28px rgb(var(--mv-cyan) / 0.10);
+  }
+
+  /* Miami Vice: nav gets a neon bottom border */
+  [data-theme="miami-vice"] header {
+    border-bottom-color: rgba(248, 144, 231, 0.25) !important;
+    box-shadow: 0 1px 24px rgba(11, 211, 211, 0.08), 0 1px 8px rgba(248, 144, 231, 0.06);
+  }
+
+  /* Matrix: green neon glows */
+  [data-theme="matrix"] .glow-accent-lg {
+    box-shadow:
+      0 0 40px rgb(var(--hp-accent) / 0.28),
+      0 0 80px rgb(var(--hp-accent) / 0.10);
+  }
+  [data-theme="matrix"] .glow-accent-sm {
+    box-shadow:
+      0 0 24px rgb(var(--hp-accent) / 0.25),
+      0 0 48px rgb(var(--hp-accent) / 0.08);
+  }
+  [data-theme="matrix"] .glow-accent-slot {
+    box-shadow: 0 0 20px rgb(var(--hp-accent) / 0.25);
+  }
+
+  [data-theme="matrix"] input:focus,
+  [data-theme="matrix"] textarea:focus {
+    box-shadow:
+      0 0 0 1px rgb(var(--hp-accent) / 0.55),
+      0 0 16px rgb(var(--hp-accent) / 0.15);
+  }
+
+  [data-theme="matrix"] header {
+    border-bottom-color: rgba(0, 255, 65, 0.2) !important;
+    box-shadow: 0 1px 20px rgba(0, 255, 65, 0.08);
+  }
+
+  /* Arc Raiders: amber/gold neon glows */
+  [data-theme="arc-raiders"] .glow-accent-lg {
+    box-shadow:
+      0 0 40px rgb(var(--hp-accent) / 0.28),
+      0 0 80px rgb(var(--hp-accent) / 0.10);
+  }
+  [data-theme="arc-raiders"] .glow-accent-sm {
+    box-shadow:
+      0 0 24px rgb(var(--hp-accent) / 0.25),
+      0 0 48px rgb(var(--hp-accent) / 0.08);
+  }
+  [data-theme="arc-raiders"] .glow-accent-slot {
+    box-shadow: 0 0 20px rgb(var(--hp-accent) / 0.22);
+  }
+
+  [data-theme="arc-raiders"] input:focus,
+  [data-theme="arc-raiders"] textarea:focus {
+    box-shadow:
+      0 0 0 1px rgb(var(--hp-accent) / 0.55),
+      0 0 16px rgb(var(--hp-accent) / 0.15);
+  }
+
+  /* Arc Raiders: amber HUD border on nav */
+  [data-theme="arc-raiders"] header {
+    border-bottom-color: rgba(238, 188, 28, 0.3) !important;
+    box-shadow: 0 1px 20px rgba(238, 188, 28, 0.08);
   }
 }
 

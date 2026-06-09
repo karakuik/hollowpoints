@@ -7,7 +7,15 @@ export const THEMES = {
   },
   'miami-vice': {
     label: 'Miami Vice',
-    dot:   '#ff2d78',
+    dot:   '#f890e7',
+  },
+  matrix: {
+    label: 'Matrix',
+    dot:   '#00ff41',
+  },
+  'arc-raiders': {
+    label: 'Raiders',
+    dot:   '#eebb1c',
   },
 }
 
