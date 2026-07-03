@@ -1,0 +1,57 @@
+---
+title: I Built an Android Auto-Clicker
+date: 2026-07-03
+description: How I built Auto Clicker Pro — a tap/hold/swipe automation tool for Android using Jetpack Compose and the Accessibility Service API.
+tags: [dev, android, kotlin, mobile]
+---
+
+I play idle games. Too many of them. At some point the question becomes "why am I manually tapping this thing 400 times" and the answer is you build a tool.
+
+That's how **Auto Clicker Pro — Tap, Hold & Swipe** happened.
+
+## What it does
+
+The app lets you drop numbered dots directly on your screen — blue for tap, orange for long press, green for swipe — and then plays that sequence back on a loop on top of whatever app you're running. You set the timing per step, pick a stop condition (forever, N cycles, or a duration), and hit play from a floating pill that lives on top of everything.
+
+The floating overlay is the whole UX. You never need to leave your game to change anything. The pill pulses green when running, amber when paused, and shows a live progress badge — "Cycle 4 of 10" or "2:34 remaining" — so you actually know what's happening.
+
+<img src="/autoclicker/screenshot1.jpg" alt="Main app screen with sequence steps" className="rounded-lg my-6 w-full max-w-sm mx-auto block" />
+
+## The tech
+
+The core mechanism is Android's **Accessibility Service API** — the only Google-sanctioned way to dispatch synthetic gestures on another app's screen. You declare an accessibility service, the user grants it in Settings, and you get `dispatchGesture()`. It's a bit of a permissions song-and-dance but it's the right primitive.
+
+Everything else is a modern Android stack: Kotlin, Jetpack Compose + Material 3, Room for persisting sequences, Coroutines/Flow throughout, Navigation Compose. I used KSP for annotation processing instead of kapt because compile times matter when you're iterating quickly.
+
+The run engine (`SequenceEngine.kt`) is deliberately isolated — pure Kotlin with injected interfaces for gesture dispatch, safety gates, and a clock. That means I can run the entire state machine, stop conditions, pause logic, and timing in JVM unit tests without touching Android at all. 53 tests, no emulator needed. That choice paid off constantly.
+
+<img src="/autoclicker/screenshot2.jpg" alt="Floating overlay pill and dot markers on screen" className="rounded-lg my-6 w-full max-w-sm mx-auto block" />
+
+## The hard part: safety
+
+Auto-clickers have a reputation for bricking phones. You look at the one-star reviews of every competitor and it's the same handful of disasters:
+
+- Overlay disappears and the only fix is pulling the battery
+- Clicker fires on the homescreen and creates a double-tap loop you can't escape
+- Service crashes mid-run and the state is gone forever
+- No way to tell how far a timed run has gotten
+
+Every one of those has a specific countermeasure in this app. There's always three ways to stop — the ✕ on the pill, a "Stop now" persistent notification action, and a Stop button in the app itself. Homescreen protection is on by default and requires a warning dialog to disable. Auto-pause triggers on screen lock and notification banners. State persists continuously and restores to *paused* (never auto-resumed) after a crash or reboot.
+
+The principle I kept coming back to: **an app that taps the screen autonomously must never resume behind the user's back.** Pauses are tagged with their cause, and an automatic resume can only undo the pause its own subsystem created. A user's explicit pause survives everything.
+
+<img src="/autoclicker/screenshot3.jpg" alt="Step settings popover with timing controls" className="rounded-lg my-6 w-full max-w-sm mx-auto block" />
+
+## Monetization
+
+Free tier gets an AdMob banner at the bottom of the main screen, plus a post-run interstitial that fires at the next return to the app after a run finishes (never during a run, never over another app, 2-minute cooldown). $1.49 one-time IAP removes both permanently. Play Billing v7 with server-side purchase verification.
+
+The run-finish event flows from the accessibility service to the ad manager through a decoupled channel — the service itself has zero ad code in it. Worth caring about.
+
+## Where it stands
+
+Feature-complete. 53 passing unit tests. CI on every push. Full code review done with all findings resolved. Custom adaptive icon shipped. R8 release build passes.
+
+What's left before launch: create the in-app product in Play Console, capture five Play Store screenshots, and push it live. Almost there.
+
+If you want to try the current build: [internal test link](https://play.google.com/apps/internaltest/4701674086000963459).

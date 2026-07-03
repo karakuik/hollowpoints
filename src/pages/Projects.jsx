@@ -4,6 +4,12 @@ import Meta from '../components/Meta'
 
 const projects = [
   {
+    name: 'Auto Clicker Pro — Tap, Hold & Swipe',
+    description: 'Android automation app that plays back tap, long-press, and swipe sequences on top of any app via the Accessibility Service API. Floating overlay, anti-detection jitter, saved configs, and a $1.49 IAP to remove ads.',
+    href: 'https://play.google.com/apps/internaltest/4701674086000963459',
+    tags: ['Kotlin', 'Android', 'Jetpack Compose'],
+  },
+  {
     name: 'Crystal Pokédex',
     description: 'GSC viability reference for Pokémon Crystal — all 251 Pokémon with stats, competitive tiers, and full evolution chains.',
     to: '/pokedex',
