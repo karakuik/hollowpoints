@@ -10,6 +10,7 @@ import TeamBuilder from './pages/TeamBuilder'
 import Now from './pages/Now'
 import Guestbook from './pages/Guestbook'
 import Recipes from './pages/Recipes'
+import NotFound from './pages/NotFound'
 
 // Leaflet is large — only load when someone visits /map
 const VisitorMap = lazy(() => import('./pages/VisitorMap'))
@@ -28,6 +29,7 @@ export default function App() {
       <Route path="/recipes"     element={<Recipes />} />
       <Route path="/map"         element={<Suspense fallback={null}><VisitorMap /></Suspense>} />
       <Route path="/about"       element={<About />} />
+      <Route path="*"            element={<NotFound />} />
     </Routes>
   )
 }
