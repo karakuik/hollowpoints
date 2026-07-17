@@ -12,11 +12,11 @@ export default function Home() {
         </p>
         <h1 className="text-5xl sm:text-7xl font-bold text-hp-text leading-none tracking-tight mb-6">
           Hi, I'm<br />
-          <span className="text-hp-accent">[Your Name]</span>
+          <span className="text-hp-accent">[Ryan]</span>
         </h1>
         <p className="text-hp-muted text-lg max-w-lg leading-relaxed mb-10">
           I write about things I care about and build projects that interest me.
-          Welcome to my corner of the internet.
+          Welcome to my Domain!!
         </p>
         <div className="flex gap-3">
           <Link

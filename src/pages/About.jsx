@@ -14,7 +14,7 @@ export default function About() {
       </div>
 
       <div className="prose prose-invert [--tw-prose-invert-links:#ff4500] max-w-xl">
-        <p>Write a bit about yourself here.</p>
+        <p>I'm Ryan, a 29 year old Software Engineer and I like to make cool shit whether its for me or for others to use.</p>
       </div>
     </Layout>
   )

@@ -65,6 +65,7 @@ const SECTIONS = [
     icon: '⚙',
     items: [
       { primary: 'hollowpoints.gg', secondary: 'This site — tools, writing, maybe a backend someday' },
+      { primary: 'Auto Clicker Pro — Tap, Hold & Swipe', secondary: 'Android automation app, tap/hold/swipe playback via Accessibility Service' },
     ],
   },
   {
@@ -123,7 +124,7 @@ export default function Now() {
         ))}
       </div>
 
-      <p className="text-hp-muted/40 text-xs mt-12">Last updated: June 2026</p>
+      <p className="text-hp-muted/40 text-xs mt-12">Last updated: July 2026</p>
     </Layout>
   )
 }
