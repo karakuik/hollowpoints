@@ -163,6 +163,90 @@ only one that exists. To add a second one cleanly:
   there are actually 2-3 of these instead of guessing the right shape now.
 - **Backend**: no changes, per above.
 
+## Recommended URL / file structure
+
+Route as **`/wow/{expansion}/{profession}`** — e.g. `/wow/midnight/jewelcrafting`
+— with `/wow` itself as a hub page listing available expansion+profession
+combos (cards, not a dropdown — this is meant to grow).
+
+Why expansion first, not `/jewelcrafting/midnight`: in Blizzard's own API,
+expansion is the structural top-level partition — each expansion is a wholly
+separate skill tier with its own recipe universe (Classic Jewelcrafting and
+Midnight Jewelcrafting share nothing but a profession name). Routing that
+way matches the data instead of fighting it. It also sidesteps a real name
+collision: this site already has `/recipes` for cooking recipes, so a WoW
+crafting-recipes section needs to live under something like `/wow/*`.
+
+```
+src/pages/wow/
+  WowHub.jsx                  /wow — pick an expansion+profession card
+  ProfessionTracker.jsx       /wow/:expansion/:profession — generic tracker,
+                               replaces the current Jewelcrafting.jsx
+
+src/data/wow/
+  registry.js                 list of available combos + display metadata
+                               (label, accent color, icon) for WowHub cards
+  recipes/
+    midnight-jewelcrafting.js RECIPES + LEARN_METHODS (moved from
+                               src/data/jewelcrafting.js)
+  itemIds/
+    midnight-jewelcrafting.js WOW_ITEM_IDS (moved from wowItemIds.js) —
+                               keep per-profession files even though slugs
+                               rarely collide, since it keeps each
+                               profession's material research self-contained
+
+netlify/functions/
+  wow-auctions.cjs            unchanged — already takes item IDs in, prices
+                               out, with zero profession-specific logic
+```
+
+`ProfessionTracker.jsx` reads its recipe/item-id modules based on the
+`:expansion`/`:profession` route params (dynamic `import()`, same idea as
+the existing lazy-loaded `VisitorMap` route in `App.jsx`) rather than
+importing every profession's data into one bundle.
+
+Migration note: moving `/jewelcrafting` → `/wow/midnight/jewelcrafting`
+breaks the current URL — add a redirect (`netlify.toml` already has a
+`[[redirects]]` block, one more entry) so the link already shared/bookmarked
+still resolves.
+
+## Design ideas for when this grows into a real section
+
+The current page borrows the site's existing dark theme system (`hp-*`
+tokens, same as every other page) rather than a bespoke look — fine for one
+profession, probably worth more personality once there's a `/wow` hub tying
+several together:
+
+- **Real item icons.** Blizzard's Media API
+  (`/data/wow/media/item/{id}?namespace=static-{region}`) returns each
+  item's actual in-game icon URL. Swapping the current text-only material
+  rows for icon + name would be the single highest-impact visual upgrade —
+  turns it from "a spreadsheet" into "a companion tool." Cache/hotlink
+  Blizzard's CDN URLs directly, no need to mirror the images.
+- **A skill-range bar instead of a badge.** A horizontal 1-100 track per
+  recipe with its orange/yellow/green/gray thresholds marked as bands,
+  instead of the current `Skill 40–60` text badge — makes the leveling
+  curve visually scannable across a whole category at a glance, and doubles
+  as a nice motif for the `/wow` hub (mini bars showing "how much of this
+  profession's data is actually filled in" per combo).
+- **Profession-tinted accent, inside whatever global theme is active.**
+  Recipes.jsx already does this per-category (`catColor` prop driving
+  border/glow/text color) — same pattern per profession: Jewelcrafting
+  gold/gem tones, Alchemy potion green/purple, Enchanting arcane blue,
+  Mining iron/rust. Stays consistent with the dusk/matrix/miami-vice/raiders
+  theme switcher instead of competing with it.
+- **`/wow` hub as an expansion timeline**, not a grid — expansion crests
+  laid left-to-right in release order, each expanding to show its
+  professions when selected. Leans into the nostalgia angle without needing
+  new visual assets beyond what Blizzard's media API already provides.
+- **A live-price ticker strip.** After a Sync, scroll the last N synced
+  prices past like a stock ticker under the header — reinforces "this is
+  live market data," and it's a small, cheap component to build once prices
+  are already in state.
+
+Pick one or two rather than all five — the icon swap and the skill-range
+bar are probably the best ratio of visual impact to build effort.
+
 ## Checklist for next time
 
 1. `GET /data/wow/profession/index` → get the profession id.
