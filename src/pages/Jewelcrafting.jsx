@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import Layout from '../components/Layout'
 import Meta from '../components/Meta'
-import { JC_BRACKETS, getAllMaterialKeys, getAllSellables } from '../data/jewelcrafting'
+import { JC_RECIPES, LEARN_METHODS, getAllMaterialKeys, getAllSellables, getCategories } from '../data/jewelcrafting'
 import { WOW_ITEM_IDS } from '../data/wowItemIds'
 import { formatMoney, parseMoney } from '../lib/money'
 
@@ -14,12 +14,6 @@ function loadState() {
   } catch {
     return {}
   }
-}
-
-const CONFIDENCE = {
-  high:   { label: 'Verified',        color: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20' },
-  medium: { label: 'Needs a look',    color: 'text-amber-400 bg-amber-400/10 border-amber-400/20' },
-  low:    { label: 'Choice-driven',   color: 'text-red-400 bg-red-400/10 border-red-400/20' },
 }
 
 // ── Money input — free-text "12g 34s 56c", commits to copper on blur ──────────
@@ -44,33 +38,76 @@ function MoneyInput({ value, onChange, placeholder }) {
   )
 }
 
-// ── One recipe row ─────────────────────────────────────────────────────────────
-function RecipeRow({ recipe, prices, setPrice, salePrices, setSalePrice, crafts, setCrafts }) {
-  const saleKey = recipe.saleKey || recipe.name
+// ── Small badges ────────────────────────────────────────────────────────────
+function LearnBadge({ learnMethod }) {
+  if (!learnMethod) {
+    return (
+      <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border text-hp-muted bg-hp-muted/10 border-hp-muted/20">
+        Unknown
+      </span>
+    )
+  }
+  const meta = LEARN_METHODS[learnMethod.type]
+  const colors = {
+    automatic: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
+    trainer: 'text-sky-400 bg-sky-400/10 border-sky-400/20',
+    specialization: 'text-violet-400 bg-violet-400/10 border-violet-400/20',
+    recipe_item: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
+    drop: 'text-red-400 bg-red-400/10 border-red-400/20',
+  }
+  return (
+    <span
+      title={learnMethod.detail}
+      className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border cursor-help ${colors[learnMethod.type] || ''}`}
+    >
+      {meta?.label || learnMethod.type}
+    </span>
+  )
+}
+
+function skillRangeText(recipe) {
+  if (recipe.skillProgression?.length) {
+    const first = recipe.skillProgression[0]
+    const last = recipe.skillProgression[recipe.skillProgression.length - 1]
+    return first === last ? `Skill ${first}` : `Skill ${first}–${last}`
+  }
+  if (recipe.skillLevelRequired != null) return `Skill ${recipe.skillLevelRequired}+`
+  return 'Skill unknown'
+}
+
+// ── One recipe card ─────────────────────────────────────────────────────────
+function RecipeCard({ recipe, prices, setPrice, salePrices, setSalePrice }) {
   const costPerCraft = recipe.materials.reduce((sum, m) => sum + m.qty * (prices[m.key] || 0), 0)
-  const totalCost = costPerCraft * crafts
-  const saleValuePerCraft = recipe.sellable ? (salePrices[saleKey] || 0) : 0
-  const totalSaleValue = saleValuePerCraft * crafts
-  const profit = totalSaleValue - totalCost
+  const saleValuePerCraft = recipe.sellable === true ? (salePrices[recipe.saleKey] || 0) : 0
+  const profit = saleValuePerCraft - costPerCraft
+  const showProfit = recipe.sellable === true && saleValuePerCraft > 0
 
   return (
     <div className="bg-hp-surface border border-hp-border rounded-lg p-4">
       <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
         <div>
           <p className="text-sm font-semibold text-hp-text">{recipe.name}</p>
-          {recipe.note && <p className="text-xs text-hp-muted mt-0.5 max-w-md">{recipe.note}</p>}
+          <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+            <span className="text-[10px] font-mono text-hp-muted">{skillRangeText(recipe)}</span>
+            <LearnBadge learnMethod={recipe.learnMethod} />
+            {recipe.sellable === false && (
+              <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border text-hp-muted bg-hp-muted/10 border-hp-muted/20">
+                Soulbound
+              </span>
+            )}
+            {recipe.sellable === null && (
+              <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border text-hp-muted bg-hp-muted/10 border-hp-muted/20">
+                Sellable unconfirmed
+              </span>
+            )}
+          </div>
+          {recipe.learnMethod?.detail && (
+            <p className="text-[11px] text-hp-muted mt-1.5 max-w-md">{recipe.learnMethod.detail}</p>
+          )}
+          {recipe.notes && (
+            <p className="text-[11px] text-amber-400/80 mt-1 max-w-md">{recipe.notes}</p>
+          )}
         </div>
-        <label className="flex items-center gap-1.5 text-[10px] text-hp-muted uppercase tracking-widest flex-shrink-0">
-          Crafts
-          <input
-            type="number"
-            min={0}
-            value={crafts}
-            onChange={e => setCrafts(Math.max(0, parseInt(e.target.value, 10) || 0))}
-            className="w-16 bg-hp-bg border border-hp-border rounded px-2 py-1 text-xs font-mono text-hp-text
-                       focus:outline-none focus:border-hp-accent/60 text-right"
-          />
-        </label>
       </div>
 
       {recipe.materials.length > 0 && (
@@ -86,77 +123,88 @@ function RecipeRow({ recipe, prices, setPrice, salePrices, setSalePrice, crafts,
         </div>
       )}
 
-      {recipe.sellable && (
+      {recipe.sellable === true && (
         <div className="flex items-center justify-between gap-3 text-xs mb-3 pt-2 border-t border-hp-border/60">
           <span className="text-hp-accent">AH sale price (per craft)</span>
-          <MoneyInput value={salePrices[saleKey]} onChange={v => setSalePrice(saleKey, v)} />
+          <MoneyInput value={salePrices[recipe.saleKey]} onChange={v => setSalePrice(recipe.saleKey, v)} />
         </div>
       )}
 
       <div className="flex items-center justify-between text-xs pt-2 border-t border-hp-border/60 font-mono">
         <span className="text-hp-muted">
-          Cost: {formatMoney(totalCost)}
-          {recipe.sellable && <> · Sale: {formatMoney(totalSaleValue)}</>}
+          Cost: {formatMoney(costPerCraft)}
+          {recipe.sellable === true && <> · Sale: {formatMoney(saleValuePerCraft)}</>}
         </span>
-        <span className={recipe.sellable ? (profit >= 0 ? 'text-emerald-400' : 'text-red-400') : 'text-hp-muted'}>
-          {recipe.sellable ? (profit >= 0 ? '+' : '') + formatMoney(Math.abs(profit)) : `−${formatMoney(totalCost)}`}
-          {recipe.sellable && profit < 0 ? ' (loss)' : ''}
-        </span>
+        {showProfit ? (
+          <span className={profit >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+            {profit >= 0 ? '+' : ''}{formatMoney(Math.abs(profit))}{profit < 0 ? ' (loss)' : ''}
+          </span>
+        ) : (
+          <span className="text-hp-muted">−{formatMoney(costPerCraft)}</span>
+        )}
       </div>
     </div>
   )
 }
 
-// ── One bracket ──────────────────────────────────────────────────────────────
-function BracketSection({ bracket, prices, setPrice, salePrices, setSalePrice, craftsState, setCraftsFor }) {
-  const conf = CONFIDENCE[bracket.confidence]
+// ── Recommended-for-leveling summary ──────────────────────────────────────────
+function RecommendedSection({ recipes, prices, salePrices }) {
+  const recommended = useMemo(() => {
+    return recipes
+      .filter(r => r.sellable === true && r.skillProgression?.length && (salePrices[r.saleKey] || 0) > 0)
+      .map(r => {
+        const cost = r.materials.reduce((sum, m) => sum + m.qty * (prices[m.key] || 0), 0)
+        const sale = salePrices[r.saleKey] || 0
+        return { recipe: r, cost, sale, profit: sale - cost }
+      })
+      .filter(x => x.profit >= 0)
+      .sort((a, b) => a.recipe.skillProgression[0] - b.recipe.skillProgression[0] || b.profit - a.profit)
+  }, [recipes, prices, salePrices])
 
-  let bracketCost = 0
-  let bracketSale = 0
-  for (const r of bracket.recipes) {
-    const key = `${bracket.id}:${r.name}`
-    const crafts = craftsState[key] ?? r.crafts
-    const costPerCraft = r.materials.reduce((sum, m) => sum + m.qty * (prices[m.key] || 0), 0)
-    bracketCost += costPerCraft * crafts
-    if (r.sellable) bracketSale += (salePrices[r.saleKey || r.name] || 0) * crafts
-  }
-  const bracketProfit = bracketSale - bracketCost
+  if (recommended.length === 0) return null
 
   return (
+    <section className="mb-10 bg-hp-elevated border border-hp-accent/30 rounded-lg p-5">
+      <h2 className="text-xs font-semibold uppercase tracking-widest text-hp-accent mb-1">Recommended right now</h2>
+      <p className="text-[11px] text-hp-muted mb-4">
+        Sellable recipes with a known skill range where sale price currently covers material cost, sorted by skill level.
+        Fill in more sale prices (or hit Sync) to surface more of these.
+      </p>
+      <div className="space-y-2">
+        {recommended.map(({ recipe, profit }) => (
+          <div key={recipe.id} className="flex items-center justify-between gap-3 text-xs bg-hp-surface border border-hp-border rounded px-3 py-2">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-hp-accent">{skillRangeText(recipe)}</span>
+              <span className="text-hp-text">{recipe.name}</span>
+            </div>
+            <span className="font-mono text-emerald-400">+{formatMoney(profit)}/craft</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+// ── Category section ──────────────────────────────────────────────────────────
+function CategorySection({ category, recipes, prices, setPrice, salePrices, setSalePrice }) {
+  const sorted = useMemo(
+    () => [...recipes].sort((a, b) => (a.skillLevelRequired ?? 999) - (b.skillLevelRequired ?? 999)),
+    [recipes]
+  )
+  return (
     <section>
-      <div className="flex items-center gap-3 mb-2">
-        <h2 className="text-lg font-bold text-hp-text">Skill {bracket.range}</h2>
-        <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border ${conf.color}`}>
-          {conf.label}
-        </span>
-      </div>
-      <p className="text-xs text-hp-muted mb-4 max-w-2xl">{bracket.summary}</p>
-
+      <h2 className="text-lg font-bold text-hp-text mb-4">{category}</h2>
       <div className="space-y-3">
-        {bracket.recipes.map(r => {
-          const key = `${bracket.id}:${r.name}`
-          return (
-            <RecipeRow
-              key={key}
-              recipe={r}
-              prices={prices}
-              setPrice={setPrice}
-              salePrices={salePrices}
-              setSalePrice={setSalePrice}
-              crafts={craftsState[key] ?? r.crafts}
-              setCrafts={v => setCraftsFor(key, v)}
-            />
-          )
-        })}
-      </div>
-
-      <div className="flex items-center justify-between mt-3 px-1 text-xs font-mono">
-        <span className="text-hp-muted uppercase tracking-widest text-[10px]">Bracket total</span>
-        <span className={bracketProfit >= 0 && bracketSale > 0 ? 'text-emerald-400' : 'text-hp-text'}>
-          {bracketSale > 0
-            ? `${bracketProfit >= 0 ? '+' : '−'}${formatMoney(Math.abs(bracketProfit))} net`
-            : `−${formatMoney(bracketCost)} to level`}
-        </span>
+        {sorted.map(r => (
+          <RecipeCard
+            key={r.id}
+            recipe={r}
+            prices={prices}
+            setPrice={setPrice}
+            salePrices={salePrices}
+            setSalePrice={setSalePrice}
+          />
+        ))}
       </div>
     </section>
   )
@@ -172,7 +220,7 @@ function useAhSync(setPrices, setSalePrices) {
       ...getAllMaterialKeys().map(m => m.key),
       ...getAllSellables().map(s => s.key),
     ]
-    return allKeys.filter(k => WOW_ITEM_IDS[k] != null)
+    return [...new Set(allKeys)].filter(k => WOW_ITEM_IDS[k] != null)
   }, [])
 
   const sync = useCallback(async () => {
@@ -188,11 +236,13 @@ function useAhSync(setPrices, setSalePrices) {
       const { prices } = await res.json()
 
       const saleKeySet = new Set(getAllSellables().map(s => s.key))
+      const materialKeySet = new Set(getAllMaterialKeys().map(m => m.key))
+
       setPrices(prev => {
         const next = { ...prev }
         for (const [id, copper] of Object.entries(prices || {})) {
           const key = idToKey[id]
-          if (key && !saleKeySet.has(key)) next[key] = copper
+          if (key && materialKeySet.has(key)) next[key] = copper
         }
         return next
       })
@@ -220,36 +270,23 @@ export default function Jewelcrafting() {
   const initial = useMemo(loadState, [])
   const [prices, setPrices] = useState(initial.prices || {})
   const [salePrices, setSalePrices] = useState(initial.salePrices || {})
-  const [craftsState, setCraftsState] = useState(initial.crafts || {})
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ prices, salePrices, crafts: craftsState }))
-  }, [prices, salePrices, craftsState])
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ prices, salePrices }))
+  }, [prices, salePrices])
 
   const setPrice = useCallback((key, v) => setPrices(p => ({ ...p, [key]: v })), [])
   const setSalePrice = useCallback((key, v) => setSalePrices(p => ({ ...p, [key]: v })), [])
-  const setCraftsFor = useCallback((key, v) => setCraftsState(c => ({ ...c, [key]: v })), [])
 
   const { sync, status, lastSynced, mappedCount } = useAhSync(setPrices, setSalePrices)
 
-  let grandCost = 0
-  let grandSale = 0
-  for (const bracket of JC_BRACKETS) {
-    for (const r of bracket.recipes) {
-      const key = `${bracket.id}:${r.name}`
-      const crafts = craftsState[key] ?? r.crafts
-      const costPerCraft = r.materials.reduce((sum, m) => sum + m.qty * (prices[m.key] || 0), 0)
-      grandCost += costPerCraft * crafts
-      if (r.sellable) grandSale += (salePrices[r.saleKey || r.name] || 0) * crafts
-    }
-  }
-  const grandNet = grandSale - grandCost
+  const categories = useMemo(getCategories, [])
 
   return (
     <Layout>
       <Meta
         title="Jewelcrafting Tracker"
-        description="Midnight Jewelcrafting 1-100 leveling path with live cost-vs-profit math for Stormrage-US."
+        description="Full Midnight Jewelcrafting recipe database with live cost-vs-profit math for Stormrage-US."
       />
 
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
@@ -257,9 +294,8 @@ export default function Jewelcrafting() {
           <p className="text-hp-accent text-xs font-semibold uppercase tracking-widest mb-2">Stormrage-US</p>
           <h1 className="text-4xl font-bold text-hp-text mb-3">Jewelcrafting Tracker</h1>
           <p className="text-hp-muted text-sm max-w-lg">
-            What to craft to level Jewelcrafting 1-100 without bleeding gold — cost-to-craft vs.
-            Auction House sale price, bracket by bracket. Prices persist locally; edit crafts counts
-            if your actual skill-ups don't match the estimate.
+            Every Midnight Jewelcrafting recipe — skill requirement, how it's learned, exact materials,
+            and cost vs. Auction House sale price per craft. Prices persist locally.
           </p>
         </div>
 
@@ -281,33 +317,25 @@ export default function Jewelcrafting() {
               ? `Synced ${lastSynced.toLocaleTimeString()}`
               : status === 'error'
               ? 'Sync failed — check function logs'
-              : `${mappedCount} item${mappedCount === 1 ? '' : 's'} mapped`}
+              : `${mappedCount} item${mappedCount === 1 ? '' : 's'} mapped (materials only — crafted-item prices are manual for now)`}
           </span>
         </div>
       </div>
 
+      <RecommendedSection recipes={JC_RECIPES} prices={prices} salePrices={salePrices} />
+
       <div className="space-y-10">
-        {JC_BRACKETS.map(bracket => (
-          <BracketSection
-            key={bracket.id}
-            bracket={bracket}
+        {categories.map(category => (
+          <CategorySection
+            key={category}
+            category={category}
+            recipes={JC_RECIPES.filter(r => r.category === category)}
             prices={prices}
             setPrice={setPrice}
             salePrices={salePrices}
             setSalePrice={setSalePrice}
-            craftsState={craftsState}
-            setCraftsFor={setCraftsFor}
           />
         ))}
-      </div>
-
-      <div className="mt-10 bg-hp-elevated border border-hp-border rounded-lg px-5 py-4 flex items-center justify-between">
-        <span className="text-xs font-semibold uppercase tracking-widest text-hp-muted">1 – 100 total</span>
-        <span className={`font-mono text-sm ${grandNet >= 0 && grandSale > 0 ? 'text-emerald-400' : 'text-hp-text'}`}>
-          {grandSale > 0
-            ? `${grandNet >= 0 ? '+' : '−'}${formatMoney(Math.abs(grandNet))} net`
-            : `−${formatMoney(grandCost)} to level`}
-        </span>
       </div>
     </Layout>
   )

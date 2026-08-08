@@ -1,28 +1,34 @@
 # Jewelcrafting Tracker
 
-`/jewelcrafting` — a cost-vs-profit calculator for leveling Midnight
-Jewelcrafting 1-100 on Stormrage-US, with an optional live Auction House
-price sync. Built Aug 2026.
+`/jewelcrafting` — the full Midnight Jewelcrafting recipe database for
+Stormrage-US, with skill requirements, how each recipe is learned, exact
+materials, and live cost-vs-profit math against the real Auction House.
+Built Aug 2026; expanded from a curated 1-100 leveling path to the complete
+79-recipe database the same week.
 
 ## What it does
 
-Answers one question: *what should I craft right now to level efficiently
-and at least break even (ideally profit) on the AH?* It's not a general AH
-scanner — it's scoped to the JC leveling path specifically, bracket by
-bracket, showing material cost vs. sale price per recipe.
+For every real Jewelcrafting recipe in Midnight (79 of them — see
+"What's excluded" below): what skill level it needs, how you actually learn
+it (trainer, specialization points, a Design item, or a rare drop), its
+exact materials, and — once you enter or sync prices — cost to craft vs. AH
+sale value per craft. A "Recommended right now" section at the top
+auto-surfaces whichever sellable recipes are currently profitable, sorted by
+skill level, instead of following one fixed guide path.
 
 - Manual price entry per material (`Xg Ys Zc` text inputs), or one-click
-  sync from the live Stormrage-US Auction House.
-- Editable crafts-per-recipe count, since the underlying leveling data has
-  varying confidence (see below) and in-game reality may differ.
-- Cost / sale value / profit computed per recipe, per bracket, and as a
-  running 1-100 total. Persisted to `localStorage`.
+  sync from the live Stormrage-US Auction House for the ~30 materials with a
+  resolved item ID.
+- Cost / sale value / profit computed per craft. No fixed "how many crafts
+  to clear this bracket" assumption anymore — that only ever applied to a
+  hand-picked leveling path, not the full recipe list.
+- Persisted to `localStorage`.
 
 ## Architecture
 
 ```
-src/pages/Jewelcrafting.jsx    UI — brackets, recipe rows, money inputs, totals
-src/data/jewelcrafting.js      the leveling path: brackets → recipes → materials
+src/pages/Jewelcrafting.jsx    UI — recommended section, category sections, recipe cards
+src/data/jewelcrafting.js      JC_RECIPES: the full recipe database
 src/data/wowItemIds.js         material/recipe key → Blizzard item ID
 src/lib/money.js               copper ⇄ "Xg Ys Zc" formatting/parsing
 netlify/functions/wow-auctions.js   OAuth + AH proxy (holds the Blizzard secret)
@@ -32,9 +38,18 @@ netlify/functions/wow-auctions.js   OAuth + AH proxy (holds the Blizzard secret)
 endpoints require an OAuth2 Client Credentials token (Client ID + Secret
 from [develop.battle.net](https://develop.battle.net/)). The secret can
 never reach the browser, so `wow-auctions.js` holds it server-side, does the
-token exchange, and proxies just the prices the frontend asks for. This is
-the same pattern the site already uses for the Steam API key in
-`netlify/functions/steam.js` — nothing new was invented here, just followed.
+token exchange, and proxies just the prices the frontend asks for. Same
+pattern the site already used for the Steam API key in
+`netlify/functions/steam.js`.
+
+Netlify's function runtime enforces the repo's root `"type": "module"` the
+same way Node does locally — a plain `.js` file using `exports.handler =`
+throws `ReferenceError: module is not defined` in production. Both
+`wow-auctions.js` and the pre-existing `steam.js` hit this; `wow-auctions`
+was fixed by renaming to `.cjs` (always CommonJS regardless of
+`package.json`, and Netlify strips the extension for the function's URL
+either way). `steam.js` still has the bug as of this writing — the Now
+page's Steam widget is 502ing in production, unrelated to this feature.
 
 **Sync flow:** the page reads `WOW_ITEM_IDS`, builds a comma-separated list
 of every mapped item ID, and calls
@@ -43,87 +58,119 @@ the client credentials for a token (cached in-memory per warm function
 instance), resolves Stormrage's connected-realm ID once, fetches both
 Blizzard auction endpoints, and returns the lowest price per item ID:
 
-- `/data/wow/auctions/commodities` — **region-wide**, not per-realm. This is
-  where stackable trade goods (ore, dust, gems, glass — most JC materials)
-  actually trade, since patch 9.0 pooled commodity markets region-wide. Easy
-  bug to make (I made it) by assuming everything is connected-realm scoped.
+- `/data/wow/auctions/commodities` — **region-wide**, not per-realm. Where
+  stackable trade goods (ore, dust, gems, glass — most raw JC materials)
+  actually trade, since patch 9.0 pooled commodity markets region-wide.
 - `/data/wow/connected-realm/{id}/auctions` — realm-specific, for
   non-commodity items (crafted gear, jewelry with random stats).
 
-The whole chain (token → realm lookup → both auction fetches → price
-lookup) has been tested against the live API with real credentials — not
-just written and assumed to work.
+The whole chain has been tested against the live API with real credentials,
+including a full round-trip through the deployed production function.
 
-## Data confidence
+## Where the recipe data came from
 
-Midnight is a new expansion; leveling guides for it disagree with each
-other, sometimes badly. Each bracket in `jewelcrafting.js` carries a
-`confidence` flag rendered as a badge on the page:
+Blizzard's Game Data API gives the authoritative recipe list — id, name,
+category — via `/data/wow/profession/755/skill-tier/2914` (755 =
+Jewelcrafting, 2914 = the Midnight skill tier). **It does not expose
+reagents, skill-level requirements, or how a recipe is learned at all** —
+that's not a gap in this research, it's a real limitation of the public API.
+That data was gathered recipe-by-recipe from `warcraft.wiki.gg` (primary —
+structured crafting infoboxes, not JS-rendered) and Wowhead spell tooltips
+(fallback), cross-checked against live Stormrage-US AH data where possible.
 
-| Bracket | Confidence | Why |
-|---|---|---|
-| 1-14 | **Verified** | Two independent guides (ConquestCapped, wow-professions.com) agree exactly on recipes and quantities. |
-| 14-50 | **Needs a look** | One detailed source only, not cross-verified. Modeled as a cumulative shopping list rather than a strict recipe order, since trainer unlocks are choice-dependent. |
-| 50-65 | **Verified** | Same two-source agreement as 1-14. |
-| 65-100 | **Choice-driven** | Genuinely not a fixed path — guides disagree on whether to prioritize gem cuts, profession equipment, or crafting-order jewelry. One material name in this bracket's data (*Petrified Root*) was checked against Blizzard's live item database and **does not exist** — this bracket's recipe list should not be trusted without an in-game check. |
+## What's excluded
 
-The crafts-per-recipe count is intentionally editable in the UI so bad
-estimates are a quick correction, not a rebuild.
+- **"Appendix I - Terms" / "Appendix II - Stats"** (9 of Blizzard's 89
+  listed recipes) — these are in-game glossary tooltips (*Quality*,
+  *Sparks*, *Concentration*, *Skill*, *Multicraft*...), not real crafts.
+- **"Recraft Equipment"** — not a materials-in/item-out recipe. It's WoW's
+  cross-profession item-upgrade system (modify an already-crafted item's
+  optional reagents/embellishments in place), unlocked automatically by
+  knowing the item's base recipe. Doesn't fit this data model at all.
 
-## Item ID mapping quirk worth knowing
+That leaves 79 real recipes, all present in the tracker.
 
-Every Jewelcrafting material currently exists in Blizzard's item database as
-a **duplicate pair** of item IDs sharing the exact same name, priced 2-13x
-apart (e.g. Crystalline Glass: 6g88s vs 93g94s). This is almost certainly an
-unlabeled crafting-quality tier (Q1 vs Q3) — the item API doesn't expose a
-field that names it. `wowItemIds.js` maps the **cheaper** ID of each pair,
-on the assumption that a leveling crafter buying materials in bulk reaches
-for the cheap version, with the pricier sibling noted in a comment. If a
-specific recipe turns out to actually require the expensive tier, that'll
-show up as Sync pulling a suspiciously low price for that material — swap
-the ID in `wowItemIds.js` and it's fixed everywhere at once.
+## Data confidence — known gaps, not guesses
+
+- **All 18 Lustrous Lapis / Austere Amethysts recipes** have no
+  `warcraft.wiki.gg` page yet (very new patch content, Feb 2026) — their
+  `skillLevelRequired`, `skillProgression`, and `learnMethod` are `null`.
+  Materials are known (pulled from live Wowhead tooltips), just not the
+  unlock info. Re-check in a few weeks once wiki coverage catches up.
+- **Midnight Crushing**'s material is genuinely ambiguous *on the source
+  itself* — the ability tooltip says "crush 3 gems," the structured recipe
+  data on the same page says "1x Duskshrouded Stone." Not a scraping error;
+  the wiki page contradicts itself. Verify in-game.
+- **Gleaming Copper Band** has no dedicated wiki page at all — skill level
+  came from a secondary guide, sellability is unconfirmed.
+- A handful of PvP/ring recipes (`Loa Worshiper's Band`,
+  `Signet of Azerothian Blessings`, a few Competitor's Crafts) only had
+  "how to acquire the Design" pages indexed, not the crafted-item page, so
+  their skill-up progression is `null`.
+- Where a field is genuinely unknown, it's `null` in the data and rendered
+  as "Skill unknown" / an "Unknown" learn-method badge in the UI — never a
+  guessed number.
+
+## Item ID mapping quirks worth knowing
+
+- **Duplicate-pair IDs.** Most materials exist in Blizzard's item database
+  as two entries with the identical name, priced 2-13x apart — almost
+  certainly an unlabeled crafting-quality tier (Q1 vs Q3) the item API
+  doesn't expose a field for. `wowItemIds.js` maps the **cheaper** ID of
+  each pair. If Sync ever shows a suspiciously low price for a material,
+  that recipe may actually need the pricier sibling — both IDs are noted in
+  a comment next to each mapping.
+- **`Petrified Root` really does exist** (item 251285) — an earlier research
+  pass concluded it didn't, because that search was capped at item ID
+  250000. Worth remembering: a negative result from a range-limited search
+  isn't proof of non-existence.
+- **`Spark` and `Competitor's Heraldry` aren't mappable as named.** Both are
+  almost certainly placeholders for a specific "Spark of [X]" /
+  season-specific heraldry item that changes by patch or PvP season (the
+  live DB currently has "Galactic [Rank]'s Heraldry," not "Competitor's
+  Heraldry"). Hardcoding an ID for either would go stale on its own. Find
+  the actual current name in-game and map it if/when you craft something
+  that needs it.
+- **`Fused Vitality` and `Thalassian Lumber`** resolve to real item IDs but
+  have zero active Auction House listings — likely BoP or otherwise
+  untradeable rather than just illiquid. Left unmapped rather than treating
+  "no listings" as a 0 price.
+- **Crafted-item (sellable output) prices are not synced yet** — only the
+  ~30 raw/intermediate materials have resolved item IDs. Sale prices are
+  manual-entry only for now. See TODO.
 
 ## TODO
 
 - [ ] **Add `BLIZZARD_CLIENT_ID` / `BLIZZARD_CLIENT_SECRET` to Netlify's
-      dashboard** (Site settings → Environment variables). Currently only in
-      the local `.env` — production Sync won't work until this is done.
-- [ ] **Rotate the Blizzard client secret.** It was pasted into a chat
-      session during setup; regenerate it on develop.battle.net once
-      everything's confirmed working, so the one in that transcript stops
+      dashboard** if not already done (Site settings → Environment
+      variables) — confirmed working in production as of this write-up.
+- [ ] **Rotate the Blizzard client secret** if it was ever pasted into a
+      chat session — regenerate on develop.battle.net so the old one stops
       being valid.
-- [ ] **Verify bracket 65-100 in-game.** *Petrified Root* doesn't exist as
-      an item — the recipe materials for "Cut Eversong Diamond" need
-      correcting from what you actually see in the crafting window, not
-      from guide data. Map `kaleidoscopic-prism`, `eversong-diamond`,
-      `cut-eversong-diamond`, and `jewelry-crafting-order` once confirmed.
-      Note: `Eversong Diamond` in Blizzard's DB is EPIC quality, which
-      smells like the *cut/finished* gem rather than a raw input — check
-      whether the recipe input is actually a differently-named rough/uncut
-      item.
-- [ ] **Double-check bracket 14-50** against your actual trainer unlocks as
-      you level through it — it's a cumulative shopping list from a single
-      source, not cross-verified.
-- [ ] **Confirm the "cheap-ore" quality-tier assumption** — first time you
-      prospect at skill 1-14, check whether the AH-synced price roughly
-      matches what you're actually buying/mining. If it's off by ~3x,
-      you're on the wrong tier of the duplicate pair; swap the ID.
+- [ ] **Fix `steam.js`** — same `.js` → `.cjs` fix that resolved
+      `wow-auctions.js`'s production crash. Separate from this feature but
+      currently broken (502) on the live site.
+- [ ] **Map item IDs for sellable crafted outputs** (62 recipes currently
+      have `sellable: true` but no resolved item ID for their own output) —
+      needed for the "Recommended right now" section to populate itself
+      without manual sale-price entry. Likely needs the non-commodity
+      per-realm auctions endpoint for BoE gear/jewelry, not just commodities.
+- [ ] **Re-check the 18 Lapis/Amethyst recipes' skill levels** once
+      `warcraft.wiki.gg` has pages for them.
+- [ ] **Verify Midnight Crushing's real reagent in-game** (gems vs.
+      Duskshrouded Stone — the source contradicts itself).
+- [ ] **Find current names for `Spark` and `Competitor's Heraldry`** in-game
+      and map them once known, if you craft anything that needs them.
 - [ ] **Local testing of Sync requires the Netlify CLI**, not just
       `npm run dev` — Vite's dev server doesn't serve
-      `/.netlify/functions/*`. Install `netlify-cli` and run `netlify dev`
-      if you want to test Sync without deploying. Not set up yet.
+      `/.netlify/functions/*`. Not set up yet.
 - [ ] *(Optional, later)* auto-refresh Sync every 5 minutes instead of
-      manual-only, per the original brief. Trivial `setInterval` addition
-      once manual Sync is confirmed solid.
-- [ ] *(Optional, later)* map item IDs for non-commodity sellables (cut
-      gems, jewelry) if you start selling crafted pieces rather than just
-      tracking leveling cost — currently only raw materials are mapped.
+      manual-only.
 
 ## Known non-issue
 
 `npm run build` / `npm run dev` fail on this machine's default Node (v23)
-with a `require is not defined` error from `tailwind.config.js`. This
-predates the Jewelcrafting Tracker entirely (reproduces on a clean
-`main` checkout) — it's an ESM/CJS mismatch between the repo's
-`"type": "module"` and Tailwind's config loader, unrelated to this feature.
+with a `require is not defined` error from `tailwind.config.js`. Predates
+this feature entirely (reproduces on a clean `main` checkout) — an ESM/CJS
+mismatch between the repo's `"type": "module"` and Tailwind's config loader.
 Works fine under Node 22.
