@@ -21,6 +21,12 @@ const projects = [
     to: '/team-builder',
     tags: ['React', 'Tool', 'Pokémon'],
   },
+  {
+    name: 'Jewelcrafting Tracker',
+    description: 'Midnight Jewelcrafting 1-100 leveling path for Stormrage-US — cost-to-craft vs. Auction House sale price per bracket, with a live AH sync.',
+    to: '/jewelcrafting',
+    tags: ['React', 'Tool', 'WoW'],
+  },
 ]
 
 export default function Projects() {

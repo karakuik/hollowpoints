@@ -10,6 +10,7 @@ import TeamBuilder from './pages/TeamBuilder'
 import Now from './pages/Now'
 import Guestbook from './pages/Guestbook'
 import Recipes from './pages/Recipes'
+import Jewelcrafting from './pages/Jewelcrafting'
 import NotFound from './pages/NotFound'
 
 // Leaflet is large — only load when someone visits /map
@@ -27,6 +28,7 @@ export default function App() {
       <Route path="/now"         element={<Now />} />
       <Route path="/guestbook"   element={<Guestbook />} />
       <Route path="/recipes"     element={<Recipes />} />
+      <Route path="/jewelcrafting" element={<Jewelcrafting />} />
       <Route path="/map"         element={<Suspense fallback={null}><VisitorMap /></Suspense>} />
       <Route path="/about"       element={<About />} />
       <Route path="*"            element={<NotFound />} />
