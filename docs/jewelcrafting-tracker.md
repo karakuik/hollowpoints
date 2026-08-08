@@ -6,6 +6,12 @@ materials, and live cost-vs-profit math against the real Auction House.
 Built Aug 2026; expanded from a curated 1-100 leveling path to the complete
 79-recipe database the same week.
 
+For the general process behind this (finding a profession's recipe list,
+researching reagents/unlock methods, resolving item IDs, managing research
+at scale) written up as a repeatable playbook — useful if this ever expands
+to other professions or expansions — see
+[`wow-tracker-playbook.md`](./wow-tracker-playbook.md).
+
 ## What it does
 
 For every real Jewelcrafting recipe in Midnight (79 of them — see
