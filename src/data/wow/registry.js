@@ -22,6 +22,28 @@ export const WOW_REGISTRY = [
     loadRecipes: () => import('./recipes/midnight-jewelcrafting.js'),
     loadItemIds: () => import('./itemIds/midnight-jewelcrafting.js'),
   },
+  {
+    expansion: 'midnight',
+    profession: 'blacksmithing',
+    expansionLabel: 'Midnight',
+    professionLabel: 'Blacksmithing',
+    realm: 'Stormrage-US',
+    description:
+      "Every Midnight Blacksmithing recipe — skill requirement, how it's learned, exact materials, and cost vs. Auction House sale price per craft.",
+    loadRecipes: () => import('./recipes/midnight-blacksmithing.js'),
+    loadItemIds: () => import('./itemIds/midnight-blacksmithing.js'),
+  },
+  {
+    expansion: 'midnight',
+    profession: 'leatherworking',
+    expansionLabel: 'Midnight',
+    professionLabel: 'Leatherworking',
+    realm: 'Stormrage-US',
+    description:
+      "Every Midnight Leatherworking recipe — skill requirement, how it's learned, exact materials, and cost vs. Auction House sale price per craft.",
+    loadRecipes: () => import('./recipes/midnight-leatherworking.js'),
+    loadItemIds: () => import('./itemIds/midnight-leatherworking.js'),
+  },
 ]
 
 export function findCombo(expansion, profession) {

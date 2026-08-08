@@ -8,10 +8,16 @@ expansions.
 
 ## What exists today, in one line
 
-One profession (Jewelcrafting), one expansion (Midnight), one realm
-(Stormrage-US), 79 recipes, behind a generic `/wow/{expansion}/{profession}`
-route + registry (see below) and a Netlify function that's already generic
-enough to not need touching for the next profession.
+Three professions (Jewelcrafting, Blacksmithing, Leatherworking), one
+expansion (Midnight), one realm (Stormrage-US), 276 recipes total (79 + 96 +
+101), behind a generic `/wow/{expansion}/{profession}` route + registry
+(see below) and a Netlify function that's already generic enough to not
+need touching for the next profession. Blacksmithing and Leatherworking
+were added in one session (Aug 2026) as the first real test of the pattern
+scaling past one profession — see
+[`blacksmithing-tracker.md`](./blacksmithing-tracker.md) and
+[`leatherworking-tracker.md`](./leatherworking-tracker.md) for their
+specific data-confidence notes; the process below held up unchanged.
 
 ## The reusable pattern
 
@@ -195,10 +201,22 @@ src/data/wow/
                                for WowHub cards, and each combo's dynamic
                                import loaders
   recipes/
-    midnight-jewelcrafting.js RECIPES + LEARN_METHODS
+    midnight-jewelcrafting.js  RECIPES + LEARN_METHODS
+    midnight-blacksmithing.js  RECIPES + LEARN_METHODS
+    midnight-leatherworking.js RECIPES + LEARN_METHODS
   itemIds/
-    midnight-jewelcrafting.js WOW_ITEM_IDS
+    midnight-jewelcrafting.js  WOW_ITEM_IDS
+    midnight-blacksmithing.js  WOW_ITEM_IDS
+    midnight-leatherworking.js WOW_ITEM_IDS
 ```
+
+Materials that appear in more than one profession's recipe list (motes,
+Petrified Root, Duskshrouded Stone, Tormented Tantalum, Sterling/Gloaming
+Alloy, etc.) are resolved once and their item IDs reused across the
+relevant `itemIds/*.js` files rather than re-searched — the Blizzard Item
+Search + commodity-price lookup is the expensive part of item-ID
+resolution, worth skipping when a later profession/expansion shares a
+material with an already-researched one.
 
 The old `/jewelcrafting` URL 301-redirects to `/wow/midnight/jewelcrafting`
 via `netlify.toml` so the already-shared/bookmarked link still resolves.
