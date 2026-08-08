@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .wow-money { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 0.35rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .wow-money-denomination { display: inline-flex; align-items: center; gap: 0.18rem; }
+  .wow-coin { width: 0.78rem; height: 0.78rem; display: inline-block; border-radius: 50%; box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.55), inset 0 -1px 1px rgb(0 0 0 / 0.45), 0 0 2px rgb(0 0 0 / 0.8); }
+  .wow-coin-gold { background: radial-gradient(circle at 35% 30%, #fff2a6 0 12%, #e9b832 35%, #8c5913 100%); border: 1px solid #f6cf57; }
+  .wow-coin-silver { background: radial-gradient(circle at 35% 30%, #fff 0 12%, #b9c1c9 38%, #5c6975 100%); border: 1px solid #dce4eb; }
+  .wow-coin-copper { background: radial-gradient(circle at 35% 30%, #ffd0a1 0 12%, #b96a35 38%, #683218 100%); border: 1px solid #d88a4d; }
+  .wow-item-icon { position: relative; display: inline-grid; place-items: center; flex: none; overflow: hidden; border: 1px solid rgb(163 124 55 / 0.85); border-radius: 0.28rem; background: rgb(var(--hp-elevated)); box-shadow: inset 0 0 0 1px rgb(255 221 137 / 0.12), 0 1px 4px rgb(0 0 0 / 0.45); }
+  .wow-item-icon-sm { width: 1.65rem; height: 1.65rem; }
+  .wow-item-icon-md { width: 2.35rem; height: 2.35rem; }
+  .wow-item-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .wow-item-icon-fallback { color: rgb(var(--hp-muted)); font: 700 0.75rem/1 serif; }
+}
+
 /* ── Theme variables ───────────────────────────────────────────────────────────
    Values are RGB channel triplets so Tailwind's opacity modifiers work:
    bg-hp-accent/20 → background-color: rgb(var(--hp-accent) / 0.2)

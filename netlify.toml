@@ -6,6 +6,11 @@
   directory = "netlify/functions"
 
 [[redirects]]
+  from = "/jewelcrafting"
+  to = "/wow/midnight/jewelcrafting"
+  status = 301
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

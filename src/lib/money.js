@@ -13,6 +13,15 @@ export function formatMoney(copper) {
   return parts.join(' ')
 }
 
+export function splitMoney(copper) {
+  const total = Math.max(0, Math.round(copper || 0))
+  return {
+    gold: Math.floor(total / 10000),
+    silver: Math.floor((total % 10000) / 100),
+    copper: total % 100,
+  }
+}
+
 // Accepts "12g 34s 56c" (any subset, any order) or a bare number treated as gold.
 export function parseMoney(str) {
   if (!str) return 0

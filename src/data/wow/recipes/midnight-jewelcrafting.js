@@ -30,9 +30,13 @@
 //     unconfirmed.
 //   - sellable: true/false confirmed BoE-vs-BoP where known; null where
 //     genuinely unconfirmed (don't assume either way).
-//   - materials[].key: matches WOW_ITEM_IDS keys in wowItemIds.js for AH
-//     sync. Some materials (Spark, Competitor's Heraldry) have no stable
-//     mapped ID — see wowItemIds.js for why.
+//   - materials[].key: matches WOW_ITEM_IDS keys in
+//     ../itemIds/midnight-jewelcrafting.js for AH sync. Some materials
+//     (Spark, Competitor's Heraldry) have no stable mapped ID — see that
+//     file for why.
+//
+// Moved from src/data/jewelcrafting.js as part of the /wow/{expansion}/
+// {profession} restructure — see docs/wow-tracker-playbook.md.
 
 export const LEARN_METHODS = {
   automatic: { label: 'Automatic', description: 'Known automatically, no trainer or purchase needed' },
@@ -42,7 +46,7 @@ export const LEARN_METHODS = {
   drop: { label: 'Drop', description: 'The recipe/design itself is a rare drop' },
 }
 
-export const JC_RECIPES = [
+export const RECIPES = [
   {
     id: 52572,
     name: "Quick Peridot",
@@ -920,7 +924,7 @@ export const JC_RECIPES = [
 // Every unique material key across all recipes, in first-appearance order.
 export function getAllMaterialKeys() {
   const seen = new Map()
-  for (const recipe of JC_RECIPES) {
+  for (const recipe of RECIPES) {
     for (const mat of recipe.materials) {
       if (!seen.has(mat.key)) seen.set(mat.key, mat.name)
     }
@@ -930,14 +934,14 @@ export function getAllMaterialKeys() {
 
 // Every recipe whose output can be sold on the AH (sellable === true).
 export function getAllSellables() {
-  return JC_RECIPES
+  return RECIPES
     .filter(r => r.sellable === true && r.saleKey)
     .map(r => ({ key: r.saleKey, name: r.name }))
 }
 
 export function getCategories() {
   const seen = new Map()
-  for (const r of JC_RECIPES) {
+  for (const r of RECIPES) {
     if (!seen.has(r.category)) seen.set(r.category, true)
   }
   return [...seen.keys()]

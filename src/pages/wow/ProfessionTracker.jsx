@@ -1,15 +1,14 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import Layout from '../components/Layout'
-import Meta from '../components/Meta'
-import { JC_RECIPES, LEARN_METHODS, getAllMaterialKeys, getAllSellables, getCategories } from '../data/jewelcrafting'
-import { WOW_ITEM_IDS } from '../data/wowItemIds'
-import { formatMoney, parseMoney } from '../lib/money'
+import { useParams } from 'react-router-dom'
+import Layout from '../../components/Layout'
+import Meta from '../../components/Meta'
+import NotFound from '../NotFound'
+import { findCombo } from '../../data/wow/registry'
+import { formatMoney, parseMoney, splitMoney } from '../../lib/money'
 
-const STORAGE_KEY = 'hp-jc-tracker'
-
-function loadState() {
+function loadState(storageKey) {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(storageKey)
     return raw ? JSON.parse(raw) : {}
   } catch {
     return {}
@@ -38,8 +37,39 @@ function MoneyInput({ value, onChange, placeholder }) {
   )
 }
 
+function MoneyDisplay({ value, sign = '', className = '' }) {
+  const { gold, silver, copper } = splitMoney(value)
+  const denominations = [
+    { key: 'gold', value: gold, label: 'Gold' },
+    { key: 'silver', value: silver, label: 'Silver' },
+    { key: 'copper', value: copper, label: 'Copper' },
+  ]
+
+  return (
+    <span className={`wow-money ${className}`} aria-label={`${sign}${formatMoney(value)}`}>
+      {sign && <span aria-hidden="true">{sign}</span>}
+      {denominations.map(({ key, value: amount, label }) => (
+        <span className="wow-money-denomination" key={key} title={`${amount} ${label}`}>
+          <span>{amount}</span>
+          <span className={`wow-coin wow-coin-${key}`} aria-hidden="true" />
+        </span>
+      ))}
+    </span>
+  )
+}
+
+function ItemIcon({ itemKey, itemName, icons, size = 'sm', showFallback = true }) {
+  const src = icons[itemKey]
+  if (!src && !showFallback) return null
+  return (
+    <span className={`wow-item-icon wow-item-icon-${size}`} title={itemName}>
+      {src ? <img src={src} alt="" loading="lazy" decoding="async" /> : <span className="wow-item-icon-fallback">?</span>}
+    </span>
+  )
+}
+
 // ── Small badges ────────────────────────────────────────────────────────────
-function LearnBadge({ learnMethod }) {
+function LearnBadge({ learnMethod, learnMethods }) {
   if (!learnMethod) {
     return (
       <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border text-hp-muted bg-hp-muted/10 border-hp-muted/20">
@@ -47,7 +77,7 @@ function LearnBadge({ learnMethod }) {
       </span>
     )
   }
-  const meta = LEARN_METHODS[learnMethod.type]
+  const meta = learnMethods[learnMethod.type]
   const colors = {
     automatic: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
     trainer: 'text-sky-400 bg-sky-400/10 border-sky-400/20',
@@ -76,7 +106,7 @@ function skillRangeText(recipe) {
 }
 
 // ── One recipe card ─────────────────────────────────────────────────────────
-function RecipeCard({ recipe, prices, setPrice, salePrices, setSalePrice }) {
+function RecipeCard({ recipe, learnMethods, prices, setPrice, salePrices, setSalePrice, icons }) {
   const costPerCraft = recipe.materials.reduce((sum, m) => sum + m.qty * (prices[m.key] || 0), 0)
   const saleValuePerCraft = recipe.sellable === true ? (salePrices[recipe.saleKey] || 0) : 0
   const profit = saleValuePerCraft - costPerCraft
@@ -86,10 +116,13 @@ function RecipeCard({ recipe, prices, setPrice, salePrices, setSalePrice }) {
     <div className="bg-hp-surface border border-hp-border rounded-lg p-4">
       <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
         <div>
-          <p className="text-sm font-semibold text-hp-text">{recipe.name}</p>
+          <div className="flex items-center gap-2.5">
+            <ItemIcon itemKey={recipe.saleKey} itemName={recipe.name} icons={icons} size="md" showFallback={false} />
+            <p className="text-sm font-semibold text-hp-text">{recipe.name}</p>
+          </div>
           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
             <span className="text-[10px] font-mono text-hp-muted">{skillRangeText(recipe)}</span>
-            <LearnBadge learnMethod={recipe.learnMethod} />
+            <LearnBadge learnMethod={recipe.learnMethod} learnMethods={learnMethods} />
             {recipe.sellable === false && (
               <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border text-hp-muted bg-hp-muted/10 border-hp-muted/20">
                 Soulbound
@@ -114,8 +147,9 @@ function RecipeCard({ recipe, prices, setPrice, salePrices, setSalePrice }) {
         <div className="space-y-1.5 mb-3">
           {recipe.materials.map(mat => (
             <div key={mat.key} className="flex items-center justify-between gap-3 text-xs">
-              <span className="text-hp-muted">
-                {mat.qty}× {mat.name}
+              <span className="flex items-center gap-2 text-hp-muted min-w-0">
+                <ItemIcon itemKey={mat.key} itemName={mat.name} icons={icons} />
+                <span>{mat.qty}× {mat.name}</span>
               </span>
               <MoneyInput value={prices[mat.key]} onChange={v => setPrice(mat.key, v)} />
             </div>
@@ -131,16 +165,16 @@ function RecipeCard({ recipe, prices, setPrice, salePrices, setSalePrice }) {
       )}
 
       <div className="flex items-center justify-between text-xs pt-2 border-t border-hp-border/60 font-mono">
-        <span className="text-hp-muted">
-          Cost: {formatMoney(costPerCraft)}
-          {recipe.sellable === true && <> · Sale: {formatMoney(saleValuePerCraft)}</>}
+        <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-hp-muted">
+          <span>Cost:</span> <MoneyDisplay value={costPerCraft} />
+          {recipe.sellable === true && <><span>· Sale:</span> <MoneyDisplay value={saleValuePerCraft} /></>}
         </span>
         {showProfit ? (
           <span className={profit >= 0 ? 'text-emerald-400' : 'text-red-400'}>
-            {profit >= 0 ? '+' : ''}{formatMoney(Math.abs(profit))}{profit < 0 ? ' (loss)' : ''}
+            <MoneyDisplay value={Math.abs(profit)} sign={profit >= 0 ? '+' : '−'} />{profit < 0 ? ' (loss)' : ''}
           </span>
         ) : (
-          <span className="text-hp-muted">−{formatMoney(costPerCraft)}</span>
+          <MoneyDisplay value={costPerCraft} sign="−" className="text-hp-muted" />
         )}
       </div>
     </div>
@@ -148,7 +182,7 @@ function RecipeCard({ recipe, prices, setPrice, salePrices, setSalePrice }) {
 }
 
 // ── Recommended-for-leveling summary ──────────────────────────────────────────
-function RecommendedSection({ recipes, prices, salePrices }) {
+function RecommendedSection({ recipes, prices, salePrices, icons }) {
   const recommended = useMemo(() => {
     return recipes
       .filter(r => r.sellable === true && r.skillProgression?.length && (salePrices[r.saleKey] || 0) > 0)
@@ -175,9 +209,10 @@ function RecommendedSection({ recipes, prices, salePrices }) {
           <div key={recipe.id} className="flex items-center justify-between gap-3 text-xs bg-hp-surface border border-hp-border rounded px-3 py-2">
             <div className="flex items-center gap-2">
               <span className="font-mono text-hp-accent">{skillRangeText(recipe)}</span>
+              <ItemIcon itemKey={recipe.saleKey} itemName={recipe.name} icons={icons} showFallback={false} />
               <span className="text-hp-text">{recipe.name}</span>
             </div>
-            <span className="font-mono text-emerald-400">+{formatMoney(profit)}/craft</span>
+            <span className="font-mono text-emerald-400"><MoneyDisplay value={profit} sign="+" />/craft</span>
           </div>
         ))}
       </div>
@@ -186,7 +221,7 @@ function RecommendedSection({ recipes, prices, salePrices }) {
 }
 
 // ── Category section ──────────────────────────────────────────────────────────
-function CategorySection({ category, recipes, prices, setPrice, salePrices, setSalePrice }) {
+function CategorySection({ category, recipes, learnMethods, prices, setPrice, salePrices, setSalePrice, icons }) {
   const sorted = useMemo(
     () => [...recipes].sort((a, b) => (a.skillLevelRequired ?? 999) - (b.skillLevelRequired ?? 999)),
     [recipes]
@@ -199,10 +234,12 @@ function CategorySection({ category, recipes, prices, setPrice, salePrices, setS
           <RecipeCard
             key={r.id}
             recipe={r}
+            learnMethods={learnMethods}
             prices={prices}
             setPrice={setPrice}
             salePrices={salePrices}
             setSalePrice={setSalePrice}
+            icons={icons}
           />
         ))}
       </div>
@@ -211,32 +248,33 @@ function CategorySection({ category, recipes, prices, setPrice, salePrices, setS
 }
 
 // ── Sync with AH ────────────────────────────────────────────────────────────
-function useAhSync(setPrices, setSalePrices) {
+function useAhSync(recipesData, itemIds, setPrices, setSalePrices) {
   const [status, setStatus] = useState('idle') // idle | loading | done | error
   const [lastSynced, setLastSynced] = useState(null)
 
   const mappedKeys = useMemo(() => {
+    if (!recipesData || !itemIds) return []
     const allKeys = [
-      ...getAllMaterialKeys().map(m => m.key),
-      ...getAllSellables().map(s => s.key),
+      ...recipesData.getAllMaterialKeys().map(m => m.key),
+      ...recipesData.getAllSellables().map(s => s.key),
     ]
-    return [...new Set(allKeys)].filter(k => WOW_ITEM_IDS[k] != null)
-  }, [])
+    return [...new Set(allKeys)].filter(k => itemIds[k] != null)
+  }, [recipesData, itemIds])
 
   const sync = useCallback(async () => {
     if (mappedKeys.length === 0) return
     setStatus('loading')
     try {
       const idToKey = {}
-      for (const k of mappedKeys) idToKey[String(WOW_ITEM_IDS[k])] = k
+      for (const k of mappedKeys) idToKey[String(itemIds[k])] = k
       const ids = Object.keys(idToKey).join(',')
 
       const res = await fetch(`/.netlify/functions/wow-auctions?items=${ids}`)
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const { prices } = await res.json()
 
-      const saleKeySet = new Set(getAllSellables().map(s => s.key))
-      const materialKeySet = new Set(getAllMaterialKeys().map(m => m.key))
+      const saleKeySet = new Set(recipesData.getAllSellables().map(s => s.key))
+      const materialKeySet = new Set(recipesData.getAllMaterialKeys().map(m => m.key))
 
       setPrices(prev => {
         const next = { ...prev }
@@ -260,50 +298,99 @@ function useAhSync(setPrices, setSalePrices) {
     } catch {
       setStatus('error')
     }
-  }, [mappedKeys, setPrices, setSalePrices])
+  }, [mappedKeys, itemIds, recipesData, setPrices, setSalePrices])
 
   return { sync, status, lastSynced, mappedCount: mappedKeys.length }
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
-export default function Jewelcrafting() {
-  const initial = useMemo(loadState, [])
-  const [prices, setPrices] = useState(initial.prices || {})
-  const [salePrices, setSalePrices] = useState(initial.salePrices || {})
+export default function ProfessionTracker() {
+  const { expansion, profession } = useParams()
+  const combo = findCombo(expansion, profession)
+
+  const [recipesData, setRecipesData] = useState(null)
+  const [itemIds, setItemIds] = useState(null)
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ prices, salePrices }))
-  }, [prices, salePrices])
+    if (!combo) return
+    let cancelled = false
+    setRecipesData(null)
+    setItemIds(null)
+    Promise.all([combo.loadRecipes(), combo.loadItemIds()]).then(([recipesMod, itemIdsMod]) => {
+      if (cancelled) return
+      setRecipesData(recipesMod)
+      setItemIds(itemIdsMod.WOW_ITEM_IDS)
+    })
+    return () => { cancelled = true }
+  }, [combo])
+
+  const storageKey = combo ? `hp-wow-${combo.expansion}-${combo.profession}` : null
+  const initial = useMemo(() => (storageKey ? loadState(storageKey) : {}), [storageKey])
+  const [prices, setPrices] = useState(initial.prices || {})
+  const [salePrices, setSalePrices] = useState(initial.salePrices || {})
+  const [icons, setIcons] = useState({})
+
+  useEffect(() => {
+    if (!storageKey) return
+    localStorage.setItem(storageKey, JSON.stringify({ prices, salePrices }))
+  }, [storageKey, prices, salePrices])
 
   const setPrice = useCallback((key, v) => setPrices(p => ({ ...p, [key]: v })), [])
   const setSalePrice = useCallback((key, v) => setSalePrices(p => ({ ...p, [key]: v })), [])
 
-  const { sync, status, lastSynced, mappedCount } = useAhSync(setPrices, setSalePrices)
+  const { sync, status, lastSynced, mappedCount } = useAhSync(recipesData, itemIds, setPrices, setSalePrices)
 
-  const categories = useMemo(getCategories, [])
+  const categories = useMemo(() => (recipesData ? recipesData.getCategories() : []), [recipesData])
+
+  useEffect(() => {
+    if (!itemIds) return
+    const controller = new AbortController()
+    const idToKeys = {}
+    for (const [key, id] of Object.entries(itemIds)) {
+      if (id == null) continue
+      if (!idToKeys[id]) idToKeys[id] = []
+      idToKeys[id].push(key)
+    }
+
+    fetch(`/.netlify/functions/wow-auctions?items=${Object.keys(idToKeys).join(',')}&media=1`, { signal: controller.signal })
+      .then(res => res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`)))
+      .then(({ media }) => {
+        const byKey = {}
+        for (const [id, url] of Object.entries(media || {})) {
+          for (const key of idToKeys[id] || []) byKey[key] = url
+        }
+        setIcons(byKey)
+      })
+      .catch(err => { if (err.name !== 'AbortError') console.warn('WoW item icons unavailable:', err) })
+
+    return () => controller.abort()
+  }, [itemIds])
+
+  if (!combo) return <NotFound />
 
   return (
     <Layout>
       <Meta
-        title="Jewelcrafting Tracker"
-        description="Full Midnight Jewelcrafting recipe database with live cost-vs-profit math for Stormrage-US."
+        title={`${combo.professionLabel} Tracker`}
+        description={combo.description}
       />
 
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-hp-accent text-xs font-semibold uppercase tracking-widest mb-2">Stormrage-US</p>
-          <h1 className="text-4xl font-bold text-hp-text mb-3">Jewelcrafting Tracker</h1>
+          <p className="text-hp-accent text-xs font-semibold uppercase tracking-widest mb-2">
+            {combo.expansionLabel} · {combo.realm}
+          </p>
+          <h1 className="text-4xl font-bold text-hp-text mb-3">{combo.professionLabel} Tracker</h1>
           <p className="text-hp-muted text-sm max-w-lg">
-            Every Midnight Jewelcrafting recipe — skill requirement, how it's learned, exact materials,
-            and cost vs. Auction House sale price per craft. Prices persist locally.
+            {combo.description} Prices persist locally.
           </p>
         </div>
 
         <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
           <button
             onClick={sync}
-            disabled={mappedCount === 0 || status === 'loading'}
-            title={mappedCount === 0 ? 'No item IDs mapped yet — see src/data/wowItemIds.js' : undefined}
+            disabled={!recipesData || mappedCount === 0 || status === 'loading'}
+            title={mappedCount === 0 ? 'No item IDs mapped yet' : undefined}
             className="px-4 py-2 text-xs font-semibold uppercase tracking-widest rounded-lg border
                        border-hp-accent/40 text-hp-accent hover:bg-hp-accent/10 transition-colors
                        disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
@@ -311,7 +398,9 @@ export default function Jewelcrafting() {
             {status === 'loading' ? 'Syncing…' : 'Sync with AH'}
           </button>
           <span className="text-[10px] text-hp-muted">
-            {mappedCount === 0
+            {!recipesData
+              ? 'Loading…'
+              : mappedCount === 0
               ? 'No items mapped yet'
               : status === 'done' && lastSynced
               ? `Synced ${lastSynced.toLocaleTimeString()}`
@@ -322,21 +411,27 @@ export default function Jewelcrafting() {
         </div>
       </div>
 
-      <RecommendedSection recipes={JC_RECIPES} prices={prices} salePrices={salePrices} />
+      {recipesData && (
+        <>
+          <RecommendedSection recipes={recipesData.RECIPES} prices={prices} salePrices={salePrices} icons={icons} />
 
-      <div className="space-y-10">
-        {categories.map(category => (
-          <CategorySection
-            key={category}
-            category={category}
-            recipes={JC_RECIPES.filter(r => r.category === category)}
-            prices={prices}
-            setPrice={setPrice}
-            salePrices={salePrices}
-            setSalePrice={setSalePrice}
-          />
-        ))}
-      </div>
+          <div className="space-y-10">
+            {categories.map(category => (
+              <CategorySection
+                key={category}
+                category={category}
+                recipes={recipesData.RECIPES.filter(r => r.category === category)}
+                learnMethods={recipesData.LEARN_METHODS}
+                prices={prices}
+                setPrice={setPrice}
+                salePrices={salePrices}
+                setSalePrice={setSalePrice}
+                icons={icons}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </Layout>
   )
 }

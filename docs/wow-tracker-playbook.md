@@ -1,6 +1,6 @@
 # WoW Tracker — expansion playbook
 
-How the Jewelcrafting Tracker (`/jewelcrafting`, see
+How the Jewelcrafting Tracker (`/wow/midnight/jewelcrafting`, see
 [`jewelcrafting-tracker.md`](./jewelcrafting-tracker.md) for its specific
 architecture and data) was actually built, written up as a repeatable
 process — for when there's appetite to add more professions and/or more
@@ -9,8 +9,9 @@ expansions.
 ## What exists today, in one line
 
 One profession (Jewelcrafting), one expansion (Midnight), one realm
-(Stormrage-US), 79 recipes, backed by a Netlify function that's already
-generic enough to not need touching for the next profession.
+(Stormrage-US), 79 recipes, behind a generic `/wow/{expansion}/{profession}`
+route + registry (see below) and a Netlify function that's already generic
+enough to not need touching for the next profession.
 
 ## The reusable pattern
 
@@ -136,36 +137,43 @@ per session rather than batching several, both for cost and because each
 batch benefits from a human (or at least a fresh conversation) sanity-check
 before shipping.
 
-## What the code would actually need to change
+## What the code looks like now (migrated Aug 2026)
 
-Current state: `src/data/jewelcrafting.js` is a flat `JC_RECIPES` array,
-implicitly scoped to one profession + one expansion by virtue of being the
-only one that exists. To add a second one cleanly:
+This section used to describe a future refactor; it's done, plus the
+real-item-icons design idea below got built in the same pass. Current shape:
 
-- **Data files**: split by profession+expansion, e.g.
-  `src/data/recipes/jewelcrafting-midnight.js`,
-  `src/data/recipes/alchemy-midnight.js`, each exporting the same shape
-  (`RECIPES`, `LEARN_METHODS` can probably be shared/hoisted since the enum
-  is profession-agnostic). An index file aggregates them for whatever the
-  UI needs.
-- **Item IDs**: `wowItemIds.js`'s keys are already just material-name slugs
-  — fine to keep as one shared file across professions as long as slugs
-  don't collide (unlikely; different material universes). Add a
-  profession-prefixed key only if a real collision ever shows up.
-- **UI**: `Jewelcrafting.jsx` would become a generic
-  `ProfessionTracker.jsx` taking a recipes-data module as input, with
-  either one page per profession+expansion or a single page with a
-  picker — same pattern `Nav.jsx` already uses for theme switching
-  (`THEMES` object + dropdown), so there's a working local precedent to
-  copy instead of inventing a new pattern.
-- **Nav / Projects**: one more entry per profession+expansion, or a single
-  "WoW Tracker" hub page that lists what's available — worth deciding once
-  there are actually 2-3 of these instead of guessing the right shape now.
-- **Backend**: no changes, per above.
+- **Data files**: split by profession+expansion —
+  `src/data/wow/recipes/midnight-jewelcrafting.js` exports `RECIPES` +
+  `LEARN_METHODS` (`LEARN_METHODS` is duplicated per file rather than
+  hoisted for now — revisit if a second profession shows the enum really is
+  identical everywhere). `src/data/wow/itemIds/midnight-jewelcrafting.js`
+  exports `WOW_ITEM_IDS`. A second profession/expansion adds one more pair
+  of files following the same shape.
+- **Item IDs**: kept as one file per profession+expansion (not a single
+  shared file) so each profession's material research stays self-contained
+  and slug collisions are structurally impossible.
+- **UI**: `Jewelcrafting.jsx` became `src/pages/wow/ProfessionTracker.jsx`
+  — takes no profession-specific props, reads `:expansion`/`:profession`
+  from the route, looks up the combo in `registry.js`, and
+  dynamic-`import()`s that combo's recipe + item-ID modules (same idea as
+  the existing lazy-loaded `VisitorMap` route in `App.jsx`, so an unrelated
+  visitor never pulls any profession's data into the shared bundle).
+- **Registry**: `src/data/wow/registry.js` is the single list of available
+  expansion+profession combos (labels, realm, description, the two dynamic
+  import loaders). `WowHub.jsx` renders it as cards; `ProfessionTracker.jsx`
+  resolves route params against it. Adding a combo is one entry here plus
+  the two data files — no other code changes.
+- **Nav / Projects**: both link to `/wow` (the hub), not to individual
+  trackers directly — settled now that the hub exists.
+- **Backend**: `wow-auctions.cjs` picked up one addition —
+  `?items=...&media=1` returns `{ media: { itemId: iconUrl } }` from
+  Blizzard's Media API (`/data/wow/media/item/{id}`), cached in-memory
+  per warm instance since icon URLs don't change. Still zero
+  profession-specific logic; a new profession needs no backend changes.
 
-## Recommended URL / file structure
+## URL / file structure
 
-Route as **`/wow/{expansion}/{profession}`** — e.g. `/wow/midnight/jewelcrafting`
+Routed as **`/wow/{expansion}/{profession}`** — e.g. `/wow/midnight/jewelcrafting`
 — with `/wow` itself as a hub page listing available expansion+profession
 combos (cards, not a dropdown — this is meant to grow).
 
@@ -180,35 +188,20 @@ crafting-recipes section needs to live under something like `/wow/*`.
 ```
 src/pages/wow/
   WowHub.jsx                  /wow — pick an expansion+profession card
-  ProfessionTracker.jsx       /wow/:expansion/:profession — generic tracker,
-                               replaces the current Jewelcrafting.jsx
+  ProfessionTracker.jsx       /wow/:expansion/:profession — generic tracker
 
 src/data/wow/
   registry.js                 list of available combos + display metadata
-                               (label, accent color, icon) for WowHub cards
+                               for WowHub cards, and each combo's dynamic
+                               import loaders
   recipes/
-    midnight-jewelcrafting.js RECIPES + LEARN_METHODS (moved from
-                               src/data/jewelcrafting.js)
+    midnight-jewelcrafting.js RECIPES + LEARN_METHODS
   itemIds/
-    midnight-jewelcrafting.js WOW_ITEM_IDS (moved from wowItemIds.js) —
-                               keep per-profession files even though slugs
-                               rarely collide, since it keeps each
-                               profession's material research self-contained
-
-netlify/functions/
-  wow-auctions.cjs            unchanged — already takes item IDs in, prices
-                               out, with zero profession-specific logic
+    midnight-jewelcrafting.js WOW_ITEM_IDS
 ```
 
-`ProfessionTracker.jsx` reads its recipe/item-id modules based on the
-`:expansion`/`:profession` route params (dynamic `import()`, same idea as
-the existing lazy-loaded `VisitorMap` route in `App.jsx`) rather than
-importing every profession's data into one bundle.
-
-Migration note: moving `/jewelcrafting` → `/wow/midnight/jewelcrafting`
-breaks the current URL — add a redirect (`netlify.toml` already has a
-`[[redirects]]` block, one more entry) so the link already shared/bookmarked
-still resolves.
+The old `/jewelcrafting` URL 301-redirects to `/wow/midnight/jewelcrafting`
+via `netlify.toml` so the already-shared/bookmarked link still resolves.
 
 ## Design ideas for when this grows into a real section
 
@@ -217,12 +210,14 @@ tokens, same as every other page) rather than a bespoke look — fine for one
 profession, probably worth more personality once there's a `/wow` hub tying
 several together:
 
-- **Real item icons.** Blizzard's Media API
-  (`/data/wow/media/item/{id}?namespace=static-{region}`) returns each
-  item's actual in-game icon URL. Swapping the current text-only material
-  rows for icon + name would be the single highest-impact visual upgrade —
-  turns it from "a spreadsheet" into "a companion tool." Cache/hotlink
-  Blizzard's CDN URLs directly, no need to mirror the images.
+- ~~**Real item icons.**~~ **Shipped.** `wow-auctions.cjs` exposes
+  `?items=...&media=1` (Blizzard Media API, in-memory cached — icon URLs
+  don't change), `ProfessionTracker.jsx` fetches it once per combo load and
+  renders icon + name for every material/recipe row via `ItemIcon`. Also
+  picked up a coin-styled `MoneyDisplay` (gold/silver/copper denominations
+  with actual coin swatches, `.wow-money`/`.wow-coin*` classes in
+  `index.css`) instead of the plain `formatMoney` text string for cost/sale/
+  profit — wasn't in the original five ideas, came free with the icon work.
 - **A skill-range bar instead of a badge.** A horizontal 1-100 track per
   recipe with its orange/yellow/green/gray thresholds marked as bands,
   instead of the current `Skill 40–60` text badge — makes the leveling
@@ -244,8 +239,8 @@ several together:
   live market data," and it's a small, cheap component to build once prices
   are already in state.
 
-Pick one or two rather than all five — the icon swap and the skill-range
-bar are probably the best ratio of visual impact to build effort.
+Of the remaining four, the skill-range bar is probably next best ratio of
+visual impact to build effort.
 
 ## Checklist for next time
 

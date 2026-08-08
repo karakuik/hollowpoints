@@ -24,6 +24,7 @@ const HEADERS = {
 let tokenCache   = { token: null, expiresAt: 0 }
 let realmCache   = { connectedRealmId: null }
 let auctionCache = { prices: null, fetchedAt: 0 }
+const mediaCache = new Map()
 
 async function getAccessToken() {
   if (tokenCache.token && Date.now() < tokenCache.expiresAt) {
@@ -103,6 +104,33 @@ async function getAuctionPrices(token, connectedRealmId) {
   return prices
 }
 
+async function getItemMedia(token, itemIds) {
+  const media = {}
+  const missing = [...new Set(itemIds)].filter(id => !mediaCache.has(id))
+  const opts = { headers: { Authorization: `Bearer ${token}` } }
+
+  for (let i = 0; i < missing.length; i += 8) {
+    const batch = missing.slice(i, i + 8)
+    await Promise.all(batch.map(async id => {
+      try {
+        const url = `https://${REGION}.api.blizzard.com/data/wow/media/item/${id}?namespace=static-${REGION}&locale=en_US`
+        const res = await fetch(url, opts)
+        if (!res.ok) return
+        const json = await res.json()
+        const icon = (json.assets || []).find(asset => asset.key === 'icon')?.value
+        if (icon) mediaCache.set(id, icon)
+      } catch (err) {
+        console.warn(`Item media lookup failed for ${id}:`, err)
+      }
+    }))
+  }
+
+  for (const id of itemIds) {
+    if (mediaCache.has(id)) media[id] = mediaCache.get(id)
+  }
+  return media
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers: HEADERS, body: '' }
@@ -124,6 +152,15 @@ exports.handler = async (event) => {
 
   try {
     const token = await getAccessToken()
+    if (event.queryStringParameters?.media === '1') {
+      const media = await getItemMedia(token, requestedIds)
+      return {
+        statusCode: 200,
+        headers: { ...HEADERS, 'Cache-Control': 'public, max-age=86400, s-maxage=604800' },
+        body: JSON.stringify({ media }),
+      }
+    }
+
     const connectedRealmId = await getConnectedRealmId(token)
     const allPrices = await getAuctionPrices(token, connectedRealmId)
 

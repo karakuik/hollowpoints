@@ -1,10 +1,12 @@
 # Jewelcrafting Tracker
 
-`/jewelcrafting` — the full Midnight Jewelcrafting recipe database for
-Stormrage-US, with skill requirements, how each recipe is learned, exact
-materials, and live cost-vs-profit math against the real Auction House.
-Built Aug 2026; expanded from a curated 1-100 leveling path to the complete
-79-recipe database the same week.
+`/wow/midnight/jewelcrafting` — the full Midnight Jewelcrafting recipe
+database for Stormrage-US, with skill requirements, how each recipe is
+learned, exact materials, and live cost-vs-profit math against the real
+Auction House. Built Aug 2026; expanded from a curated 1-100 leveling path
+to the complete 79-recipe database the same week, then migrated from
+`/jewelcrafting` to the `/wow/{expansion}/{profession}` structure (old URL
+redirects) so more professions/expansions can slot in as siblings.
 
 For the general process behind this (finding a profession's recipe list,
 researching reagents/unlock methods, resolving item IDs, managing research
@@ -33,12 +35,27 @@ skill level, instead of following one fixed guide path.
 ## Architecture
 
 ```
-src/pages/Jewelcrafting.jsx    UI — recommended section, category sections, recipe cards
-src/data/jewelcrafting.js      JC_RECIPES: the full recipe database
-src/data/wowItemIds.js         material/recipe key → Blizzard item ID
-src/lib/money.js               copper ⇄ "Xg Ys Zc" formatting/parsing
-netlify/functions/wow-auctions.js   OAuth + AH proxy (holds the Blizzard secret)
+src/pages/wow/WowHub.jsx                       /wow — pick an expansion+profession card
+src/pages/wow/ProfessionTracker.jsx            /wow/:expansion/:profession — generic tracker UI
+src/data/wow/registry.js                       list of available expansion+profession combos
+src/data/wow/recipes/midnight-jewelcrafting.js RECIPES + LEARN_METHODS: the full recipe database
+src/data/wow/itemIds/midnight-jewelcrafting.js WOW_ITEM_IDS: material/recipe key → Blizzard item ID
+src/lib/money.js                               copper ⇄ "Xg Ys Zc" formatting/parsing
+netlify/functions/wow-auctions.cjs             OAuth + AH proxy (holds the Blizzard secret) — generic, not profession-specific
 ```
+
+`ProfessionTracker.jsx` reads `:expansion`/`:profession` from the route,
+looks the combo up in `registry.js`, and dynamic-`import()`s its recipe and
+item-ID modules — see
+[`wow-tracker-playbook.md`](./wow-tracker-playbook.md#url--file-structure)
+for the reasoning behind this structure. Adding a second profession or
+expansion means adding one data-file pair plus one `registry.js` entry, no
+UI or backend changes.
+
+Recipe/material rows show the real in-game item icon (Blizzard's Media API,
+proxied through `wow-auctions.cjs?items=...&media=1` and cached in-memory
+per warm function instance) and prices render as `MoneyDisplay` — actual
+gold/silver/copper coin swatches — instead of plain `Xg Ys Zc` text.
 
 **Why a backend function at all:** Blizzard's Game Data API auction
 endpoints require an OAuth2 Client Credentials token (Client ID + Secret
@@ -122,7 +139,7 @@ That leaves 79 real recipes, all present in the tracker.
 - **Duplicate-pair IDs.** Most materials exist in Blizzard's item database
   as two entries with the identical name, priced 2-13x apart — almost
   certainly an unlabeled crafting-quality tier (Q1 vs Q3) the item API
-  doesn't expose a field for. `wowItemIds.js` maps the **cheaper** ID of
+  doesn't expose a field for. `itemIds/midnight-jewelcrafting.js` maps the **cheaper** ID of
   each pair. If Sync ever shows a suspiciously low price for a material,
   that recipe may actually need the pricier sibling — both IDs are noted in
   a comment next to each mapping.

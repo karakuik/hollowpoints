@@ -6,7 +6,7 @@ import { useTheme, THEMES } from '../lib/theme'
 const PROJECT_LINKS = [
   { to: '/pokedex',       label: 'Crystal Pokédex' },
   { to: '/team-builder',  label: 'GSC Team Builder' },
-  { to: '/jewelcrafting', label: 'Jewelcrafting Tracker' },
+  { to: '/wow',           label: 'WoW Trackers' },
 ]
 
 function ThemeSwitcher() {

@@ -14,9 +14,12 @@
 // tier, Sync will show a suspiciously low price for that material — swap
 // the ID here and it's fixed everywhere at once.
 //
-// Keys must match the `key` fields in jewelcrafting.js exactly. Any key left
-// null is skipped by sync and falls back to manual entry — the tracker works
-// fine with a partially-filled map.
+// Keys must match the `key` fields in ../recipes/midnight-jewelcrafting.js
+// exactly. Any key left null is skipped by sync and falls back to manual
+// entry — the tracker works fine with a partially-filled map.
+//
+// Moved from src/data/wowItemIds.js as part of the /wow/{expansion}/
+// {profession} restructure — see docs/wow-tracker-playbook.md.
 
 export const WOW_ITEM_IDS = {
   // Prospecting/crushing byproducts + core gem-cutting reagents

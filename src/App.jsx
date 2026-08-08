@@ -10,11 +10,15 @@ import TeamBuilder from './pages/TeamBuilder'
 import Now from './pages/Now'
 import Guestbook from './pages/Guestbook'
 import Recipes from './pages/Recipes'
-import Jewelcrafting from './pages/Jewelcrafting'
 import NotFound from './pages/NotFound'
 
 // Leaflet is large — only load when someone visits /map
 const VisitorMap = lazy(() => import('./pages/VisitorMap'))
+// WoW tracker data modules are per-profession and dynamic-imported by
+// ProfessionTracker itself — keep the page component lazy too so an
+// unrelated visitor never pulls any of it into the main bundle.
+const WowHub = lazy(() => import('./pages/wow/WowHub'))
+const ProfessionTracker = lazy(() => import('./pages/wow/ProfessionTracker'))
 
 export default function App() {
   return (
@@ -28,7 +32,8 @@ export default function App() {
       <Route path="/now"         element={<Now />} />
       <Route path="/guestbook"   element={<Guestbook />} />
       <Route path="/recipes"     element={<Recipes />} />
-      <Route path="/jewelcrafting" element={<Jewelcrafting />} />
+      <Route path="/wow"         element={<Suspense fallback={null}><WowHub /></Suspense>} />
+      <Route path="/wow/:expansion/:profession" element={<Suspense fallback={null}><ProfessionTracker /></Suspense>} />
       <Route path="/map"         element={<Suspense fallback={null}><VisitorMap /></Suspense>} />
       <Route path="/about"       element={<About />} />
       <Route path="*"            element={<NotFound />} />

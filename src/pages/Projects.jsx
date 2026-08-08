@@ -22,9 +22,9 @@ const projects = [
     tags: ['React', 'Tool', 'Pokémon'],
   },
   {
-    name: 'Jewelcrafting Tracker',
-    description: 'Midnight Jewelcrafting 1-100 leveling path for Stormrage-US — cost-to-craft vs. Auction House sale price per bracket, with a live AH sync.',
-    to: '/jewelcrafting',
+    name: 'WoW Profession Trackers',
+    description: 'Full Midnight Jewelcrafting recipe database for Stormrage-US — skill requirements, unlock methods, exact materials, live Auction House cost-vs-profit math. Built to grow into more professions and expansions.',
+    to: '/wow',
     tags: ['React', 'Tool', 'WoW'],
   },
 ]
