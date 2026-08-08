@@ -343,6 +343,7 @@ export default function ProfessionTracker() {
   const categories = useMemo(() => (recipesData ? recipesData.getCategories() : []), [recipesData])
 
   useEffect(() => {
+    setIcons({})
     if (!itemIds) return
     const controller = new AbortController()
     const idToKeys = {}
