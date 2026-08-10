@@ -44,6 +44,17 @@ export const WOW_REGISTRY = [
     loadRecipes: () => import('./recipes/midnight-leatherworking.js'),
     loadItemIds: () => import('./itemIds/midnight-leatherworking.js'),
   },
+  {
+    expansion: 'classic',
+    profession: 'blacksmithing',
+    expansionLabel: 'Classic',
+    professionLabel: 'Blacksmithing',
+    realm: 'Stormrage-US',
+    description:
+      "1→300 leveling route for retail's Classic Blacksmithing skill tier (not a Classic Era server) — one recipe per bracket, exact materials, and live Auction House cost on Stormrage-US.",
+    loadRecipes: () => import('./recipes/classic-blacksmithing.js'),
+    loadItemIds: () => import('./itemIds/classic-blacksmithing.js'),
+  },
 ]
 
 export function findCombo(expansion, profession) {
