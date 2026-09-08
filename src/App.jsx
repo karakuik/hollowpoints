@@ -19,6 +19,7 @@ const VisitorMap = lazy(() => import('./pages/VisitorMap'))
 // unrelated visitor never pulls any of it into the main bundle.
 const WowHub = lazy(() => import('./pages/wow/WowHub'))
 const ProfessionTracker = lazy(() => import('./pages/wow/ProfessionTracker'))
+const FirstBlood = lazy(() => import('./pages/FirstBlood'))
 
 export default function App() {
   return (
@@ -36,6 +37,8 @@ export default function App() {
       <Route path="/wow/:expansion/:profession" element={<Suspense fallback={null}><ProfessionTracker /></Suspense>} />
       <Route path="/map"         element={<Suspense fallback={null}><VisitorMap /></Suspense>} />
       <Route path="/about"       element={<About />} />
+      <Route path="/first-blood" element={<Suspense fallback={null}><FirstBlood /></Suspense>} />
+      <Route path="/first-blood/player/:gameName" element={<Suspense fallback={null}><FirstBlood /></Suspense>} />
       <Route path="*"            element={<NotFound />} />
     </Routes>
   )
