@@ -3,7 +3,7 @@ const headers={ 'Content-Type':'application/json','Cache-Control':'public, max-a
 const reply=(statusCode,body)=>({statusCode,headers,body:JSON.stringify(body)})
 exports.handler=async event=>{
   if(event.httpMethod!=='GET') return reply(405,{error:'Method not allowed'})
-  const gameName=String(event.queryStringParameters?.gameName||'').trim()
+  const gameName=String(event.queryStringParameters?.gameName||decodeURIComponent(event.path.split('/').pop()||'')||'').trim()
   const tagLine=String(event.queryStringParameters?.tagLine||'').replace(/^#/,'').trim()
   if(!gameName||!tagLine) return reply(400,{error:'Enter a player name and tag'})
   const riotId=`${gameName}#${tagLine}`, identity=riotId.normalize('NFKC').toLowerCase()
