@@ -6,16 +6,6 @@
   directory = "netlify/functions"
 
 [[redirects]]
-  from = "/api/upload/matches"
-  to = "/.netlify/functions/first-blood-upload"
-  status = 200
-
-[[redirects]]
-  from = "/api/players/:gameName"
-  to = "/.netlify/functions/first-blood-player?gameName=:gameName"
-  status = 200
-
-[[redirects]]
   from = "/jewelcrafting"
   to = "/wow/midnight/jewelcrafting"
   status = 301
