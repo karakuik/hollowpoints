@@ -7,6 +7,7 @@ const PROJECT_LINKS = [
   { to: '/pokedex',       label: 'Crystal Pokédex' },
   { to: '/team-builder',  label: 'GSC Team Builder' },
   { to: '/wow',           label: 'WoW Trackers' },
+  { to: '/first-blood',   label: 'First Blood' },
 ]
 
 function ThemeSwitcher() {
