@@ -1,4 +1,4 @@
 /.netlify/functions/* /.netlify/functions/:splat 200
 /api/upload/matches /.netlify/functions/first-blood-upload 200
-/api/players/* /.netlify/functions/first-blood-player?gameName=:splat 200
+/api/players/:gameName tagLine=:tag /.netlify/functions/first-blood-player?gameName=:gameName&tagLine=:tag 200
 /* /index.html 200
