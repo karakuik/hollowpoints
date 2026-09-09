@@ -17,3 +17,7 @@ The enrollment endpoint is `https://hollowpoints.gg/api/upload/register`; the ma
 ## Revoking one PC
 
 Open Supabase's `first_blood_uploaders` table, find the PC by its `label`, and set `revoked_at` to the current date and time. Other uploaders continue working.
+
+## Refreshing Mayhem augment icons
+
+After a League patch adds or removes Mayhem augments, open the League client and run `npm run sync:first-blood-augments` from this repository. The script reads Riot's current KIWI catalog, verifies every augment has metadata, and replaces the bundled catalog and PNG icons. Commit the generated `public/first-blood/augments` files with the rest of the site update.

@@ -1,0 +1,1561 @@
+{
+  "generatedAt": "2026-09-09T05:41:45.002Z",
+  "mode": "KIWI",
+  "count": 222,
+  "augments": [
+    {
+      "id": 1001,
+      "augmentNameId": "ARAM_ImTheJuggernaut",
+      "name": "Titan's Resolve",
+      "rarity": "kPrismatic",
+      "icon": "1001.png"
+    },
+    {
+      "id": 1002,
+      "augmentNameId": "ARAM_ApexInventor",
+      "name": "Apex Inventor",
+      "rarity": "kGold",
+      "icon": "1002.png"
+    },
+    {
+      "id": 1004,
+      "augmentNameId": "ARAM_BacktoBasics",
+      "name": "Back To Basics",
+      "rarity": "kPrismatic",
+      "icon": "1004.png"
+    },
+    {
+      "id": 1005,
+      "augmentNameId": "ARAM_WeeWooWeeWoo",
+      "name": "Wee Woo Wee Woo",
+      "rarity": "kGold",
+      "icon": "1005.png"
+    },
+    {
+      "id": 1006,
+      "augmentNameId": "ARAM_BladeWaltz",
+      "name": "Blade Waltz",
+      "rarity": "kPrismatic",
+      "icon": "1006.png"
+    },
+    {
+      "id": 1007,
+      "augmentNameId": "ARAM_BluntForce",
+      "name": "Blunt Force",
+      "rarity": "kSilver",
+      "icon": "1007.png"
+    },
+    {
+      "id": 1011,
+      "augmentNameId": "ARAM_CantTouchThis",
+      "name": "Can't Touch This",
+      "rarity": "kPrismatic",
+      "icon": "1011.png"
+    },
+    {
+      "id": 1013,
+      "augmentNameId": "ARAM_CelestialBody",
+      "name": "Celestial Body",
+      "rarity": "kGold",
+      "icon": "1013.png"
+    },
+    {
+      "id": 1015,
+      "augmentNameId": "ARAM_CircleofDeath",
+      "name": "Circle of Death",
+      "rarity": "kPrismatic",
+      "icon": "1015.png"
+    },
+    {
+      "id": 1018,
+      "augmentNameId": "ARAM_CourageoftheColossus",
+      "name": "Courage of the Colossus",
+      "rarity": "kPrismatic",
+      "icon": "1018.png"
+    },
+    {
+      "id": 1019,
+      "augmentNameId": "ARAM_Dashing",
+      "name": "Dashing",
+      "rarity": "kPrismatic",
+      "icon": "1019.png"
+    },
+    {
+      "id": 1020,
+      "augmentNameId": "ARAM_DawnbringersResolve",
+      "name": "Dawnbringer's Resolve",
+      "rarity": "kGold",
+      "icon": "1020.png"
+    },
+    {
+      "id": 1022,
+      "augmentNameId": "ARAM_Deft",
+      "name": "Deft",
+      "rarity": "kSilver",
+      "icon": "1022.png"
+    },
+    {
+      "id": 1025,
+      "augmentNameId": "ARAM_DiveBomber",
+      "name": "Dive Bomber",
+      "rarity": "kSilver",
+      "icon": "1025.png"
+    },
+    {
+      "id": 1026,
+      "augmentNameId": "ARAM_DontBlink",
+      "name": "Don't Blink",
+      "rarity": "kSilver",
+      "icon": "1026.png"
+    },
+    {
+      "id": 1027,
+      "augmentNameId": "ARAM_Earthwake",
+      "name": "Earthwake",
+      "rarity": "kPrismatic",
+      "icon": "1027.png"
+    },
+    {
+      "id": 1028,
+      "augmentNameId": "ARAM_Erosion",
+      "name": "Erosion",
+      "rarity": "kSilver",
+      "icon": "1028.png"
+    },
+    {
+      "id": 1029,
+      "augmentNameId": "ARAM_EtherealWeapon",
+      "name": "Ethereal Weapon",
+      "rarity": "kGold",
+      "icon": "1029.png"
+    },
+    {
+      "id": 1030,
+      "augmentNameId": "ARAM_Eureka",
+      "name": "Eureka",
+      "rarity": "kPrismatic",
+      "icon": "1030.png"
+    },
+    {
+      "id": 1034,
+      "augmentNameId": "VeilOfWarding",
+      "name": "Veil of Warding",
+      "rarity": "kSilver",
+      "icon": "1034.png"
+    },
+    {
+      "id": 1036,
+      "augmentNameId": "ARAM_Firebrand",
+      "name": "Firebrand",
+      "rarity": "kGold",
+      "icon": "1036.png"
+    },
+    {
+      "id": 1037,
+      "augmentNameId": "ARAM_FirstAidKit",
+      "name": "First-Aid Kit",
+      "rarity": "kSilver",
+      "icon": "1037.png"
+    },
+    {
+      "id": 1038,
+      "augmentNameId": "ARAM_FromBeginningToEnd",
+      "name": "From Beginning To End",
+      "rarity": "kGold",
+      "icon": "1038.png"
+    },
+    {
+      "id": 1041,
+      "augmentNameId": "ARAM_Goliath",
+      "name": "Goliath",
+      "rarity": "kPrismatic",
+      "icon": "1041.png"
+    },
+    {
+      "id": 1044,
+      "augmentNameId": "ARAM_IceCold",
+      "name": "Ice Cold",
+      "rarity": "kSilver",
+      "icon": "1044.png"
+    },
+    {
+      "id": 1045,
+      "augmentNameId": "ARAM_InfernalConduit",
+      "name": "Infernal Conduit",
+      "rarity": "kPrismatic",
+      "icon": "1045.png"
+    },
+    {
+      "id": 1046,
+      "augmentNameId": "ARAM_InfernalSoul",
+      "name": "Infernal Soul",
+      "rarity": "kSilver",
+      "icon": "1046.png"
+    },
+    {
+      "id": 1047,
+      "augmentNameId": "ARAM_ItsCritical",
+      "name": "It's Critical",
+      "rarity": "kGold",
+      "icon": "1047.png"
+    },
+    {
+      "id": 1048,
+      "augmentNameId": "ARAM_JeweledGauntlet",
+      "name": "Jeweled Gauntlet",
+      "rarity": "kPrismatic",
+      "icon": "1048.png"
+    },
+    {
+      "id": 1051,
+      "augmentNameId": "ARAM_LightemUp",
+      "name": "Light 'Em Up!",
+      "rarity": "kSilver",
+      "icon": "1051.png"
+    },
+    {
+      "id": 1053,
+      "augmentNameId": "ARAM_MadScientist",
+      "name": "Mad Scientist",
+      "rarity": "kPrismatic",
+      "icon": "1053.png"
+    },
+    {
+      "id": 1054,
+      "augmentNameId": "ARAM_MasterofDuality",
+      "name": "Master of Duality",
+      "rarity": "kPrismatic",
+      "icon": "1054.png"
+    },
+    {
+      "id": 1056,
+      "augmentNameId": "ARAM_MindtoMatter",
+      "name": "Mind to Matter",
+      "rarity": "kSilver",
+      "icon": "1056.png"
+    },
+    {
+      "id": 1057,
+      "augmentNameId": "ARAM_MountainSoul",
+      "name": "Mountain Soul",
+      "rarity": "kSilver",
+      "icon": "1057.png"
+    },
+    {
+      "id": 1058,
+      "augmentNameId": "ARAM_MysticPunch",
+      "name": "Mystic Punch",
+      "rarity": "kPrismatic",
+      "icon": "1058.png"
+    },
+    {
+      "id": 1060,
+      "augmentNameId": "ARAM_OceanSoul",
+      "name": "Ocean Soul",
+      "rarity": "kSilver",
+      "icon": "1060.png"
+    },
+    {
+      "id": 1061,
+      "augmentNameId": "ARAM_OkBoomerang",
+      "name": "Ok Boomerang",
+      "rarity": "kGold",
+      "icon": "1061.png"
+    },
+    {
+      "id": 1062,
+      "augmentNameId": "ARAM_OmniSoul",
+      "name": "Omni Soul",
+      "rarity": "kPrismatic",
+      "icon": "1062.png"
+    },
+    {
+      "id": 1063,
+      "augmentNameId": "ARAM_OutlawsGrit",
+      "name": "Outlaw's Grit",
+      "rarity": "kGold",
+      "icon": "1063.png"
+    },
+    {
+      "id": 1064,
+      "augmentNameId": "ARAM_Perseverance",
+      "name": "Perseverance",
+      "rarity": "kGold",
+      "icon": "1064.png"
+    },
+    {
+      "id": 1066,
+      "augmentNameId": "ARAM_QuantumComputing",
+      "name": "Quantum Computing",
+      "rarity": "kPrismatic",
+      "icon": "1066.png"
+    },
+    {
+      "id": 1067,
+      "augmentNameId": "ARAM_RabbleRousing",
+      "name": "Rejuvenation",
+      "rarity": "kGold",
+      "icon": "1067.png"
+    },
+    {
+      "id": 1068,
+      "augmentNameId": "ARAM_Recursion",
+      "name": "Recursion",
+      "rarity": "kGold",
+      "icon": "1068.png"
+    },
+    {
+      "id": 1071,
+      "augmentNameId": "ARAM_ScopierWeapons",
+      "name": "Scopier Weapons",
+      "rarity": "kGold",
+      "icon": "1071.png"
+    },
+    {
+      "id": 1072,
+      "augmentNameId": "ARAM_SearingDawn",
+      "name": "Searing Dawn",
+      "rarity": "kGold",
+      "icon": "1072.png"
+    },
+    {
+      "id": 1073,
+      "augmentNameId": "ARAM_ShadowRunner",
+      "name": "Shadow Runner",
+      "rarity": "kSilver",
+      "icon": "1073.png"
+    },
+    {
+      "id": 1074,
+      "augmentNameId": "ARAM_ShrinkRay",
+      "name": "Shrink Ray",
+      "rarity": "kGold",
+      "icon": "1074.png"
+    },
+    {
+      "id": 1076,
+      "augmentNameId": "ARAM_SonicBoom",
+      "name": "Sonic Boom",
+      "rarity": "kSilver",
+      "icon": "1076.png"
+    },
+    {
+      "id": 1077,
+      "augmentNameId": "ARAM_SoulSiphon",
+      "name": "Soul Siphon",
+      "rarity": "kGold",
+      "icon": "1077.png"
+    },
+    {
+      "id": 1079,
+      "augmentNameId": "ARAM_SymphonyofWar",
+      "name": "Symphony of War",
+      "rarity": "kPrismatic",
+      "icon": "1079.png"
+    },
+    {
+      "id": 1080,
+      "augmentNameId": "ARAM_TankItOrLeaveIt",
+      "name": "Tank It Or Leave It",
+      "rarity": "kSilver",
+      "icon": "1080.png"
+    },
+    {
+      "id": 1081,
+      "augmentNameId": "ARAM_TapDancer",
+      "name": "Tap Dancer",
+      "rarity": "kPrismatic",
+      "icon": "1081.png"
+    },
+    {
+      "id": 1084,
+      "augmentNameId": "ARAM_ThreadtheNeedle",
+      "name": "Thread the Needle",
+      "rarity": "kGold",
+      "icon": "1084.png"
+    },
+    {
+      "id": 1087,
+      "augmentNameId": "ARAM_Typhoon",
+      "name": "Typhoon",
+      "rarity": "kSilver",
+      "icon": "1087.png"
+    },
+    {
+      "id": 1088,
+      "augmentNameId": "ARAM_UltimateRevolution",
+      "name": "Ultimate Revolution",
+      "rarity": "kPrismatic",
+      "icon": "1088.png"
+    },
+    {
+      "id": 1092,
+      "augmentNameId": "ARAM_Vulnerability",
+      "name": "Vulnerability",
+      "rarity": "kGold",
+      "icon": "1092.png"
+    },
+    {
+      "id": 1095,
+      "augmentNameId": "ARAM_WindspeakersBlessing",
+      "name": "Windspeaker's Blessing",
+      "rarity": "kPrismatic",
+      "icon": "1095.png"
+    },
+    {
+      "id": 1097,
+      "augmentNameId": "ARAM_WitchfulThinking",
+      "name": "Witchful Thinking",
+      "rarity": "kSilver",
+      "icon": "1097.png"
+    },
+    {
+      "id": 1098,
+      "augmentNameId": "ARAM_WithHaste",
+      "name": "With Haste",
+      "rarity": "kGold",
+      "icon": "1098.png"
+    },
+    {
+      "id": 1103,
+      "augmentNameId": "ARAM_BreadAndButter",
+      "name": "Bread And Butter",
+      "rarity": "kGold",
+      "icon": "1103.png"
+    },
+    {
+      "id": 1104,
+      "augmentNameId": "ARAM_Minionmancer",
+      "name": "Minionmancer",
+      "rarity": "kGold",
+      "icon": "1104.png"
+    },
+    {
+      "id": 1105,
+      "augmentNameId": "ARAM_Homeguard",
+      "name": "Homeguard",
+      "rarity": "kSilver",
+      "icon": "1105.png"
+    },
+    {
+      "id": 1112,
+      "augmentNameId": "ARAM_UltimateUnstoppable",
+      "name": "Ultimate Unstoppable",
+      "rarity": "kSilver",
+      "icon": "1112.png"
+    },
+    {
+      "id": 1113,
+      "augmentNameId": "ARAM_SkilledSniper",
+      "name": "Skilled Sniper",
+      "rarity": "kGold",
+      "icon": "1113.png"
+    },
+    {
+      "id": 1115,
+      "augmentNameId": "ARAM_ScopiestWeapons",
+      "name": "Scopiest Weapons",
+      "rarity": "kPrismatic",
+      "icon": "1115.png"
+    },
+    {
+      "id": 1116,
+      "augmentNameId": "ARAM_Flashy",
+      "name": "Flashy",
+      "rarity": "kGold",
+      "icon": "1116.png"
+    },
+    {
+      "id": 1118,
+      "augmentNameId": "ARAM_CriticalHealing",
+      "name": "Critical Healing",
+      "rarity": "kGold",
+      "icon": "1118.png"
+    },
+    {
+      "id": 1129,
+      "augmentNameId": "ARAM_Marksmage",
+      "name": "Marksmage",
+      "rarity": "kGold",
+      "icon": "1129.png"
+    },
+    {
+      "id": 1133,
+      "augmentNameId": "ARAM_MagicMissile",
+      "name": "Magic Missile",
+      "rarity": "kGold",
+      "icon": "1133.png"
+    },
+    {
+      "id": 1134,
+      "augmentNameId": "ARAM_DrawYourSword",
+      "name": "Draw Your Sword",
+      "rarity": "kPrismatic",
+      "icon": "1134.png"
+    },
+    {
+      "id": 1136,
+      "augmentNameId": "ARAM_SlapAround",
+      "name": "Slap Around",
+      "rarity": "kSilver",
+      "icon": "1136.png"
+    },
+    {
+      "id": 1138,
+      "augmentNameId": "ARAM_Goredrink",
+      "name": "Goredrink",
+      "rarity": "kSilver",
+      "icon": "1138.png"
+    },
+    {
+      "id": 1141,
+      "augmentNameId": "ARAM_AllForYou",
+      "name": "All For You",
+      "rarity": "kGold",
+      "icon": "1141.png"
+    },
+    {
+      "id": 1149,
+      "augmentNameId": "ARAM_Impassable",
+      "name": "Impassable",
+      "rarity": "kGold",
+      "icon": "1149.png"
+    },
+    {
+      "id": 1150,
+      "augmentNameId": "ARAM_BreadAndJam",
+      "name": "Bread And Jam",
+      "rarity": "kGold",
+      "icon": "1150.png"
+    },
+    {
+      "id": 1151,
+      "augmentNameId": "ARAM_BreadAndCheese",
+      "name": "Bread and Cheese",
+      "rarity": "kGold",
+      "icon": "1151.png"
+    },
+    {
+      "id": 1152,
+      "augmentNameId": "ARAM_Quest_SteelYourHeart",
+      "name": "Steel Your Heart",
+      "rarity": "kGold",
+      "icon": "1152.png"
+    },
+    {
+      "id": 1154,
+      "augmentNameId": "ARAM_Quest_UrfsChampion",
+      "name": "Urf's Champion",
+      "rarity": "kPrismatic",
+      "icon": "1154.png"
+    },
+    {
+      "id": 1156,
+      "augmentNameId": "ARAM_Quest_WoogletsWitchcap",
+      "name": "Wooglet's Witchcap",
+      "rarity": "kPrismatic",
+      "icon": "1156.png"
+    },
+    {
+      "id": 1170,
+      "augmentNameId": "ARAM_ScopedWeapons",
+      "name": "Scoped Weapons",
+      "rarity": "kSilver",
+      "icon": "1170.png"
+    },
+    {
+      "id": 1180,
+      "augmentNameId": "ARAM_BigBrain",
+      "name": "Big Brain",
+      "rarity": "kGold",
+      "icon": "1180.png"
+    },
+    {
+      "id": 1181,
+      "augmentNameId": "ARAM_HeavyHitter",
+      "name": "Heavy Hitter",
+      "rarity": "kSilver",
+      "icon": "1181.png"
+    },
+    {
+      "id": 1187,
+      "augmentNameId": "ARAM_Flashbang",
+      "name": "Flashbang",
+      "rarity": "kSilver",
+      "icon": "1187.png"
+    },
+    {
+      "id": 1194,
+      "augmentNameId": "ARAM_FeyMagic",
+      "name": "Fey Magic",
+      "rarity": "kPrismatic",
+      "icon": "1194.png"
+    },
+    {
+      "id": 1195,
+      "augmentNameId": "ARAM_GiantSlayer",
+      "name": "Giant Slayer",
+      "rarity": "kPrismatic",
+      "icon": "1195.png"
+    },
+    {
+      "id": 1204,
+      "augmentNameId": "ARAM_StackosaurusRex",
+      "name": "Stackosaurus Rex",
+      "rarity": "kSilver",
+      "icon": "1204.png"
+    },
+    {
+      "id": 1205,
+      "augmentNameId": "ARAM_ADAPt",
+      "name": "ADAPt",
+      "rarity": "kSilver",
+      "icon": "1205.png"
+    },
+    {
+      "id": 1206,
+      "augmentNameId": "ARAM_escAPADe",
+      "name": "escAPADe",
+      "rarity": "kSilver",
+      "icon": "1206.png"
+    },
+    {
+      "id": 1211,
+      "augmentNameId": "ARAM_ItsKillingTime",
+      "name": "It's Killing Time",
+      "rarity": "kGold",
+      "icon": "1211.png"
+    },
+    {
+      "id": 1214,
+      "augmentNameId": "ARAM_SpinToWin",
+      "name": "Spin To Win",
+      "rarity": "kSilver",
+      "icon": "1214.png"
+    },
+    {
+      "id": 1220,
+      "augmentNameId": "ARAM_FanTheHammer",
+      "name": "Fan The Hammer",
+      "rarity": "kPrismatic",
+      "icon": "1220.png"
+    },
+    {
+      "id": 1225,
+      "augmentNameId": "ARAM_DualWield",
+      "name": "Dual Wield",
+      "rarity": "kPrismatic",
+      "icon": "1225.png"
+    },
+    {
+      "id": 1237,
+      "augmentNameId": "ARAM_TransmuteGold",
+      "name": "Transmute: Gold",
+      "rarity": "kSilver",
+      "icon": "1237.png"
+    },
+    {
+      "id": 1238,
+      "augmentNameId": "ARAM_TransmutePrismatic",
+      "name": "Transmute: Prismatic",
+      "rarity": "kGold",
+      "icon": "1238.png"
+    },
+    {
+      "id": 1243,
+      "augmentNameId": "ARAM_TransmuteChaos",
+      "name": "Transmute: Chaos",
+      "rarity": "kPrismatic",
+      "icon": "1243.png"
+    },
+    {
+      "id": 1301,
+      "augmentNameId": "ARAM_DivineIntervention",
+      "name": "Divine Intervention",
+      "rarity": "kGold",
+      "icon": "1301.png"
+    },
+    {
+      "id": 1305,
+      "augmentNameId": "ARAM_LegDay",
+      "name": "Leg Day",
+      "rarity": "kSilver",
+      "icon": "1305.png"
+    },
+    {
+      "id": 1308,
+      "augmentNameId": "ARAM_Firefox",
+      "name": "FireFox",
+      "rarity": "kSilver",
+      "icon": "1308.png"
+    },
+    {
+      "id": 1311,
+      "augmentNameId": "ARAM_Overflow",
+      "name": "Overflow",
+      "rarity": "kGold",
+      "icon": "1311.png"
+    },
+    {
+      "id": 1314,
+      "augmentNameId": "MightyShield",
+      "name": "Mighty Shield",
+      "rarity": "kSilver",
+      "icon": "1314.png"
+    },
+    {
+      "id": 1315,
+      "augmentNameId": "SwiftAndSafe",
+      "name": "Swift and Safe",
+      "rarity": "kSilver",
+      "icon": "1315.png"
+    },
+    {
+      "id": 1318,
+      "augmentNameId": "ARAM_Upgrade_ZH",
+      "name": "Upgrade Zhonya's",
+      "rarity": "kSilver",
+      "icon": "1318.png"
+    },
+    {
+      "id": 1319,
+      "augmentNameId": "ARAM_Upgrade_Immolate",
+      "name": "Upgrade Immolate",
+      "rarity": "kSilver",
+      "icon": "1319.png"
+    },
+    {
+      "id": 1320,
+      "augmentNameId": "ARAM_Upgrade_Collector",
+      "name": "Upgrade Collector",
+      "rarity": "kSilver",
+      "icon": "1320.png"
+    },
+    {
+      "id": 1322,
+      "augmentNameId": "ARAM_GetExcited",
+      "name": "Get Excited!",
+      "rarity": "kGold",
+      "icon": "1322.png"
+    },
+    {
+      "id": 1323,
+      "augmentNameId": "ARAM_Cruelty",
+      "name": "Cruelty",
+      "rarity": "kPrismatic",
+      "icon": "1323.png"
+    },
+    {
+      "id": 1324,
+      "augmentNameId": "ARAM_ProteinShake",
+      "name": "Protein Shake",
+      "rarity": "kPrismatic",
+      "icon": "1324.png"
+    },
+    {
+      "id": 1325,
+      "augmentNameId": "GlassCannon",
+      "name": "Glass Cannon",
+      "rarity": "kPrismatic",
+      "icon": "1325.png"
+    },
+    {
+      "id": 1326,
+      "augmentNameId": "Nightstalking",
+      "name": "Nightstalking",
+      "rarity": "kGold",
+      "icon": "1326.png"
+    },
+    {
+      "id": 1327,
+      "augmentNameId": "Adamant",
+      "name": "Adamant",
+      "rarity": "kSilver",
+      "icon": "1327.png"
+    },
+    {
+      "id": 1328,
+      "augmentNameId": "CriticalRhythm",
+      "name": "Critical Rhythm",
+      "rarity": "kGold",
+      "icon": "1328.png"
+    },
+    {
+      "id": 1329,
+      "augmentNameId": "BiggestSnowballEver",
+      "name": "Biggest Snowball Ever",
+      "rarity": "kPrismatic",
+      "icon": "1329.png"
+    },
+    {
+      "id": 1331,
+      "augmentNameId": "EmpyreanPromise",
+      "name": "Empyrean Promise",
+      "rarity": "kPrismatic",
+      "icon": "1331.png"
+    },
+    {
+      "id": 1332,
+      "augmentNameId": "OminousPact",
+      "name": "Ominous Pact",
+      "rarity": "kPrismatic",
+      "icon": "1332.png"
+    },
+    {
+      "id": 1333,
+      "augmentNameId": "EscapePlan",
+      "name": "Escape Plan",
+      "rarity": "kSilver",
+      "icon": "1333.png"
+    },
+    {
+      "id": 1334,
+      "augmentNameId": "SnowballUpgrade",
+      "name": "Snowball Upgrade",
+      "rarity": "kGold",
+      "icon": "1334.png"
+    },
+    {
+      "id": 1335,
+      "augmentNameId": "Goldrend",
+      "name": "Goldrend",
+      "rarity": "kPrismatic",
+      "icon": "1335.png"
+    },
+    {
+      "id": 1336,
+      "augmentNameId": "ARAM_Upgrade_IE",
+      "name": "Upgrade Infinity Edge",
+      "rarity": "kGold",
+      "icon": "1336.png"
+    },
+    {
+      "id": 1337,
+      "augmentNameId": "KingMe",
+      "name": "King Me",
+      "rarity": "kPrismatic",
+      "icon": "1337.png"
+    },
+    {
+      "id": 1343,
+      "augmentNameId": "Quest_Sneakerhead",
+      "name": "Sneakerhead",
+      "rarity": "kPrismatic",
+      "icon": "1343.png"
+    },
+    {
+      "id": 1344,
+      "augmentNameId": "FinalForm",
+      "name": "Final Form",
+      "rarity": "kPrismatic",
+      "icon": "1344.png"
+    },
+    {
+      "id": 1345,
+      "augmentNameId": "ARAM_SpiritualPurification",
+      "name": "Spiritual Purification",
+      "rarity": "kGold",
+      "icon": "1345.png"
+    },
+    {
+      "id": 1346,
+      "augmentNameId": "Vampirism",
+      "name": "Vampirism",
+      "rarity": "kGold",
+      "icon": "1346.png"
+    },
+    {
+      "id": 1347,
+      "augmentNameId": "Poltergeist",
+      "name": "Poltergeist",
+      "rarity": "kSilver",
+      "icon": "1347.png"
+    },
+    {
+      "id": 1348,
+      "augmentNameId": "Flash2",
+      "name": "Flash 2",
+      "rarity": "kSilver",
+      "icon": "1348.png"
+    },
+    {
+      "id": 1349,
+      "augmentNameId": "UltimateAwakening",
+      "name": "Ultimate Awakening",
+      "rarity": "kPrismatic",
+      "icon": "1349.png"
+    },
+    {
+      "id": 1353,
+      "augmentNameId": "ARAM_TankEngine",
+      "name": "Tank Engine",
+      "rarity": "kGold",
+      "icon": "1353.png"
+    },
+    {
+      "id": 1356,
+      "augmentNameId": "CriticalMissile",
+      "name": "Critical Missile",
+      "rarity": "kGold",
+      "icon": "1356.png"
+    },
+    {
+      "id": 1358,
+      "augmentNameId": "PinballSnowball",
+      "name": "Pinball",
+      "rarity": "kGold",
+      "icon": "1358.png"
+    },
+    {
+      "id": 1361,
+      "augmentNameId": "ARAM_Quest_VoidImmolation",
+      "name": "Icathia's Fall",
+      "rarity": "kPrismatic",
+      "icon": "1361.png"
+    },
+    {
+      "id": 1373,
+      "augmentNameId": "ShrinkEngine",
+      "name": "Shrink Engine",
+      "rarity": "kGold",
+      "icon": "1373.png"
+    },
+    {
+      "id": 1375,
+      "augmentNameId": "SoulEater",
+      "name": "Soul Eater",
+      "rarity": "kGold",
+      "icon": "1375.png"
+    },
+    {
+      "id": 1379,
+      "augmentNameId": "Upgrade_SwordOfBlossom",
+      "name": "Upgrade Sword of Blossoming Dawn",
+      "rarity": "kPrismatic",
+      "icon": "1379.png"
+    },
+    {
+      "id": 1384,
+      "augmentNameId": "Donation",
+      "name": "Donation",
+      "rarity": "kGold",
+      "icon": "1384.png"
+    },
+    {
+      "id": 1386,
+      "augmentNameId": "YouSpinMeRightRound",
+      "name": "Spin Me Right Round",
+      "rarity": "kSilver",
+      "icon": "1386.png"
+    },
+    {
+      "id": 1388,
+      "augmentNameId": "InfiniteRecursion",
+      "name": "Infinite Recursion",
+      "rarity": "kPrismatic",
+      "icon": "1388.png"
+    },
+    {
+      "id": 1389,
+      "augmentNameId": "HandOfBaron",
+      "name": "Hand of Baron",
+      "rarity": "kPrismatic",
+      "icon": "1389.png"
+    },
+    {
+      "id": 1390,
+      "augmentNameId": "ARAM_PhenomenalEvil",
+      "name": "Phenomenal Evil",
+      "rarity": "kGold",
+      "icon": "1390.png"
+    },
+    {
+      "id": 1392,
+      "augmentNameId": "GoldenSnowball",
+      "name": "Holy Snowball",
+      "rarity": "kPrismatic",
+      "icon": "1392.png"
+    },
+    {
+      "id": 1401,
+      "augmentNameId": "GrowthSpurt",
+      "name": "Growth Spurt",
+      "rarity": "kGold",
+      "icon": "1401.png"
+    },
+    {
+      "id": 1402,
+      "augmentNameId": "ARAM_StatsOnStatsOnStats",
+      "name": "Stats on Stats on Stats!",
+      "rarity": "kPrismatic",
+      "icon": "1402.png"
+    },
+    {
+      "id": 1403,
+      "augmentNameId": "ARAM_StatsOnStats",
+      "name": "Stats on Stats!",
+      "rarity": "kGold",
+      "icon": "1403.png"
+    },
+    {
+      "id": 1404,
+      "augmentNameId": "ARAM_Stats",
+      "name": "Stats!",
+      "rarity": "kSilver",
+      "icon": "1404.png"
+    },
+    {
+      "id": 1413,
+      "augmentNameId": "ARAM_StuckInHereWithMe",
+      "name": "Stuck In Here With Me",
+      "rarity": "kPrismatic",
+      "icon": "1413.png"
+    },
+    {
+      "id": 1415,
+      "augmentNameId": "Twinfire",
+      "name": "Twin Fire",
+      "rarity": "kSilver",
+      "icon": "1415.png"
+    },
+    {
+      "id": 1416,
+      "augmentNameId": "HextechSoul",
+      "name": "Hextech Soul",
+      "rarity": "kSilver",
+      "icon": "1416.png"
+    },
+    {
+      "id": 1420,
+      "augmentNameId": "Sonata",
+      "name": "Sonata",
+      "rarity": "kGold",
+      "icon": "1420.png"
+    },
+    {
+      "id": 1421,
+      "augmentNameId": "PromQueen",
+      "name": "Prom Queen",
+      "rarity": "kPrismatic",
+      "icon": "1421.png"
+    },
+    {
+      "id": 1996,
+      "augmentNameId": "ARAM_Upgrade_Sheen",
+      "name": "Upgrade Sheen",
+      "rarity": "kGold",
+      "icon": "1996.png"
+    },
+    {
+      "id": 2004,
+      "augmentNameId": "ARAM_EmpoweredByTheFaithful",
+      "name": "Empowered By The Faithful",
+      "rarity": "kPrismatic",
+      "icon": "2004.png"
+    },
+    {
+      "id": 2005,
+      "augmentNameId": "ARAM_InfernoTriggered",
+      "name": "Triggered Inferno",
+      "rarity": "kPrismatic",
+      "icon": "2005.png"
+    },
+    {
+      "id": 2006,
+      "augmentNameId": "ARAM_Dropkick",
+      "name": "Dropkick",
+      "rarity": "kPrismatic",
+      "icon": "2006.png"
+    },
+    {
+      "id": 2007,
+      "augmentNameId": "ARAM_LittleDevil",
+      "name": "Devil on Your Shoulder",
+      "rarity": "kPrismatic",
+      "icon": "2007.png"
+    },
+    {
+      "id": 2009,
+      "augmentNameId": "ARAM_Zealot",
+      "name": "Zealot",
+      "rarity": "kSilver",
+      "icon": "2009.png"
+    },
+    {
+      "id": 2010,
+      "augmentNameId": "ARAM_DoubleTap",
+      "name": "Double Tap",
+      "rarity": "kPrismatic",
+      "icon": "2010.png"
+    },
+    {
+      "id": 2016,
+      "augmentNameId": "ARAM_Juiced",
+      "name": "Juiced",
+      "rarity": "kSilver",
+      "icon": "2016.png"
+    },
+    {
+      "id": 2018,
+      "augmentNameId": "ARAM_Purist_Caster",
+      "name": "Purist - Caster",
+      "rarity": "kSilver",
+      "icon": "2018.png"
+    },
+    {
+      "id": 2024,
+      "augmentNameId": "CritNCast",
+      "name": "Crit 'n Cast",
+      "rarity": "kSilver",
+      "icon": "2024.png"
+    },
+    {
+      "id": 2026,
+      "augmentNameId": "KillSecured",
+      "name": "Kill Secured",
+      "rarity": "kSilver",
+      "icon": "2026.png"
+    },
+    {
+      "id": 2031,
+      "augmentNameId": "ARAM_DropBear",
+      "name": "DropBear",
+      "rarity": "kPrismatic",
+      "icon": "2031.png"
+    },
+    {
+      "id": 2032,
+      "augmentNameId": "FishBait",
+      "name": "Shark Bait",
+      "rarity": "kGold",
+      "icon": "2032.png"
+    },
+    {
+      "id": 2034,
+      "augmentNameId": "SharkTempest",
+      "name": "Shark Tempest",
+      "rarity": "kGold",
+      "icon": "2034.png"
+    },
+    {
+      "id": 2042,
+      "augmentNameId": "BrushPower",
+      "name": "Hide on Bush",
+      "rarity": "kGold",
+      "icon": "2042.png"
+    },
+    {
+      "id": 2043,
+      "augmentNameId": "NatureIsHealing",
+      "name": "Nature is Healing",
+      "rarity": "kGold",
+      "icon": "2043.png"
+    },
+    {
+      "id": 2046,
+      "augmentNameId": "PoroCharge_Active",
+      "name": "Poro Stampede",
+      "rarity": "kPrismatic",
+      "icon": "2046.png"
+    },
+    {
+      "id": 2054,
+      "augmentNameId": "SpellVolley",
+      "name": "Tripleshot",
+      "rarity": "kPrismatic",
+      "icon": "2054.png"
+    },
+    {
+      "id": 2055,
+      "augmentNameId": "ARAM_Multishot",
+      "name": "Multishot",
+      "rarity": "kPrismatic",
+      "icon": "2055.png"
+    },
+    {
+      "id": 2062,
+      "augmentNameId": "Ability_SelfAOE_DoubleCast",
+      "name": "Echo Cast",
+      "rarity": "kPrismatic",
+      "icon": "2062.png"
+    },
+    {
+      "id": 2063,
+      "augmentNameId": "DimensionShift_Active",
+      "name": "Dimension Shift",
+      "rarity": "kPrismatic",
+      "icon": "2063.png"
+    },
+    {
+      "id": 2064,
+      "augmentNameId": "ARAM_Quickstep",
+      "name": "Quickstep",
+      "rarity": "kGold",
+      "icon": "2064.png"
+    },
+    {
+      "id": 2065,
+      "augmentNameId": "ARAM_Terror",
+      "name": "Terror",
+      "rarity": "kGold",
+      "icon": "2065.png"
+    },
+    {
+      "id": 2072,
+      "augmentNameId": "Missile_Split",
+      "name": "Spell Split",
+      "rarity": "kPrismatic",
+      "icon": "2072.png"
+    },
+    {
+      "id": 2073,
+      "augmentNameId": "ARAM_SustainingStrike",
+      "name": "Siphon",
+      "rarity": "kSilver",
+      "icon": "2073.png"
+    },
+    {
+      "id": 2076,
+      "augmentNameId": "TitansPulse",
+      "name": "Stay Resolute",
+      "rarity": "kSilver",
+      "icon": "2076.png"
+    },
+    {
+      "id": 2077,
+      "augmentNameId": "DarkWind",
+      "name": "Ravenous Bind",
+      "rarity": "kGold",
+      "icon": "2077.png"
+    },
+    {
+      "id": 2078,
+      "augmentNameId": "ChainReaction",
+      "name": "Chain Reaction",
+      "rarity": "kGold",
+      "icon": "2078.png"
+    },
+    {
+      "id": 2080,
+      "augmentNameId": "Snowbomb",
+      "name": "Snowblast",
+      "rarity": "kGold",
+      "icon": "2080.png"
+    },
+    {
+      "id": 2082,
+      "augmentNameId": "Equilibrium",
+      "name": "Our Healing",
+      "rarity": "kGold",
+      "icon": "2082.png"
+    },
+    {
+      "id": 2083,
+      "augmentNameId": "BurstingTeeth",
+      "name": "Tooth Fairy",
+      "rarity": "kGold",
+      "icon": "2083.png"
+    },
+    {
+      "id": 2087,
+      "augmentNameId": "ARAM_Archmage",
+      "name": "Archmage",
+      "rarity": "kPrismatic",
+      "icon": "2087.png"
+    },
+    {
+      "id": 2088,
+      "augmentNameId": "ARAM_Snowday",
+      "name": "Snowday",
+      "rarity": "kSilver",
+      "icon": "2088.png"
+    },
+    {
+      "id": 2089,
+      "augmentNameId": "ARAM_YowchMyCoins",
+      "name": "Yowch, My Coins!",
+      "rarity": "kGold",
+      "icon": "2089.png"
+    },
+    {
+      "id": 2091,
+      "augmentNameId": "EndlessDecimation",
+      "name": "Endless Decimation",
+      "rarity": "kGold",
+      "icon": "2091.png"
+    },
+    {
+      "id": 2095,
+      "augmentNameId": "ARAM_HighRoller",
+      "name": "High Roller",
+      "rarity": "kPrismatic",
+      "icon": "2095.png"
+    },
+    {
+      "id": 2096,
+      "augmentNameId": "LittleExtraHelp",
+      "name": "Lil' Extra Help",
+      "rarity": "kGold",
+      "icon": "2096.png"
+    },
+    {
+      "id": 2097,
+      "augmentNameId": "VoidDash",
+      "name": "Void Dash",
+      "rarity": "kGold",
+      "icon": "2097.png"
+    },
+    {
+      "id": 2098,
+      "augmentNameId": "ARAM_EndlessHunt",
+      "name": "En Passant",
+      "rarity": "kPrismatic",
+      "icon": "2098.png"
+    },
+    {
+      "id": 2099,
+      "augmentNameId": "ARAM_DivineDomain",
+      "name": "Rite of Ascension",
+      "rarity": "kPrismatic",
+      "icon": "2099.png"
+    },
+    {
+      "id": 2100,
+      "augmentNameId": "ARAM_SpecializedRecursion",
+      "name": "Pursuit of Haste",
+      "rarity": "kGold",
+      "icon": "2100.png"
+    },
+    {
+      "id": 2102,
+      "augmentNameId": "PressureCooker",
+      "name": "Pressure Cooker",
+      "rarity": "kGold",
+      "icon": "2102.png"
+    },
+    {
+      "id": 2103,
+      "augmentNameId": "ARAM_BangBang",
+      "name": "From Downtown",
+      "rarity": "kGold",
+      "icon": "2103.png"
+    },
+    {
+      "id": 2104,
+      "augmentNameId": "ARAM_SpiritBomb",
+      "name": "Spirit Bomb",
+      "rarity": "kPrismatic",
+      "icon": "2104.png"
+    },
+    {
+      "id": 2107,
+      "augmentNameId": "ARAM_Hellbent",
+      "name": "Hellbent",
+      "rarity": "kPrismatic",
+      "icon": "2107.png"
+    },
+    {
+      "id": 2108,
+      "augmentNameId": "SupportMain",
+      "name": "Support Main",
+      "rarity": "kSilver",
+      "icon": "2108.png"
+    },
+    {
+      "id": 2109,
+      "augmentNameId": "SnapBack",
+      "name": "Snap Back",
+      "rarity": "kGold",
+      "icon": "2109.png"
+    },
+    {
+      "id": 2111,
+      "augmentNameId": "Bonk",
+      "name": "BONK!",
+      "rarity": "kGold",
+      "icon": "2111.png"
+    },
+    {
+      "id": 2115,
+      "augmentNameId": "SquishySlappyGrab",
+      "name": "Squishy Slappy Grab",
+      "rarity": "kPrismatic",
+      "icon": "2115.png"
+    },
+    {
+      "id": 2116,
+      "augmentNameId": "SpecializedEmpowerment",
+      "name": "Pursuit of Power",
+      "rarity": "kGold",
+      "icon": "2116.png"
+    },
+    {
+      "id": 2118,
+      "augmentNameId": "SkipTheBasics",
+      "name": "Ult Bot",
+      "rarity": "kPrismatic",
+      "icon": "2118.png"
+    },
+    {
+      "id": 2119,
+      "augmentNameId": "Overextender",
+      "name": "Overextender",
+      "rarity": "kGold",
+      "icon": "2119.png"
+    },
+    {
+      "id": 2123,
+      "augmentNameId": "Overloaded",
+      "name": "Overloaded",
+      "rarity": "kPrismatic",
+      "icon": "2123.png"
+    },
+    {
+      "id": 2125,
+      "augmentNameId": "ItsGoTime",
+      "name": "It's Go Time",
+      "rarity": "kSilver",
+      "icon": "2125.png"
+    },
+    {
+      "id": 2126,
+      "augmentNameId": "KeepGoing",
+      "name": "Reload",
+      "rarity": "kGold",
+      "icon": "2126.png"
+    },
+    {
+      "id": 2127,
+      "augmentNameId": "ForgedByTheMaster",
+      "name": "Forged By The Master",
+      "rarity": "kSilver",
+      "icon": "2127.png"
+    },
+    {
+      "id": 2128,
+      "augmentNameId": "BloodMoneyBurn",
+      "name": "Combusting Interest",
+      "rarity": "kGold",
+      "icon": "2128.png"
+    },
+    {
+      "id": 2129,
+      "augmentNameId": "Terraind",
+      "name": "Terrain'd",
+      "rarity": "kGold",
+      "icon": "2129.png"
+    },
+    {
+      "id": 2131,
+      "augmentNameId": "DontChangeTheChannel",
+      "name": "Don't Change the Channel",
+      "rarity": "kSilver",
+      "icon": "2131.png"
+    },
+    {
+      "id": 2132,
+      "augmentNameId": "WarlockJuicebox",
+      "name": "Warlock Juicebox",
+      "rarity": "kGold",
+      "icon": "2132.png"
+    },
+    {
+      "id": 2133,
+      "augmentNameId": "MercysStrike",
+      "name": "Mercy's Strike",
+      "rarity": "kGold",
+      "icon": "2133.png"
+    },
+    {
+      "id": 2134,
+      "augmentNameId": "SurgeField",
+      "name": "Surge Field",
+      "rarity": "kPrismatic",
+      "icon": "2134.png"
+    },
+    {
+      "id": 2135,
+      "augmentNameId": "Overkill",
+      "name": "Pin Cushion",
+      "rarity": "kPrismatic",
+      "icon": "2135.png"
+    },
+    {
+      "id": 2136,
+      "augmentNameId": "TrustyWeapon",
+      "name": "Trusty Weapon",
+      "rarity": "kSilver",
+      "icon": "2136.png"
+    },
+    {
+      "id": 2137,
+      "augmentNameId": "PatOnTheBack",
+      "name": "Pat On The Back",
+      "rarity": "kGold",
+      "icon": "2137.png"
+    },
+    {
+      "id": 2138,
+      "augmentNameId": "WardingWeapon",
+      "name": "Adaptive Ward",
+      "rarity": "kSilver",
+      "icon": "2138.png"
+    },
+    {
+      "id": 2139,
+      "augmentNameId": "PinCushion",
+      "name": "Porcupine",
+      "rarity": "kGold",
+      "icon": "2139.png"
+    },
+    {
+      "id": 2140,
+      "augmentNameId": "Upgrade_Ravenous",
+      "name": "Upgrade Ravenous Hydra",
+      "rarity": "kGold",
+      "icon": "2140.png"
+    },
+    {
+      "id": 2141,
+      "augmentNameId": "Quest_UltraHydra",
+      "name": "Ultra Hydra",
+      "rarity": "kPrismatic",
+      "icon": "2141.png"
+    },
+    {
+      "id": 2143,
+      "augmentNameId": "Upgrade_SunderedSky",
+      "name": "Upgrade Sundered Sky",
+      "rarity": "kGold",
+      "icon": "2143.png"
+    },
+    {
+      "id": 2144,
+      "augmentNameId": "DoubleDefense",
+      "name": "Bolstered",
+      "rarity": "kSilver",
+      "icon": "2144.png"
+    },
+    {
+      "id": 2148,
+      "augmentNameId": "DoubleStrike",
+      "name": "Double Strike",
+      "rarity": "kSilver",
+      "icon": "2148.png"
+    },
+    {
+      "id": 2157,
+      "augmentNameId": "Upgrade_DeathDance",
+      "name": "Upgrade Death's Dance",
+      "rarity": "kSilver",
+      "icon": "2157.png"
+    },
+    {
+      "id": 12317,
+      "augmentNameId": "ARAM_PandorasBox",
+      "name": "Pandora's Box",
+      "rarity": "kPrismatic",
+      "icon": "12317.png"
+    }
+  ]
+}

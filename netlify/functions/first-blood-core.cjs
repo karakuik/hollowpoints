@@ -46,6 +46,18 @@ function validateRecord(record) {
     if (typeof participant.champion !== 'string' || !participant.champion.trim() || participant.champion.length > 80) return 'Invalid participant champion'
     if (participant.kills != null && !finiteInteger(participant.kills, 0, 500)) return 'Invalid participant kills'
     if (participant.pentakills != null && !finiteInteger(participant.pentakills, 0, 50)) return 'Invalid participant pentakills'
+    if (participant.augments != null) {
+      if (!Array.isArray(participant.augments) || participant.augments.length > 6) return 'Invalid participant augments'
+      const augmentIds = new Set()
+      const augmentOrders = new Set()
+      for (const augment of participant.augments) {
+        if (!augment || typeof augment !== 'object' || !finiteInteger(augment.id, 1, 1000000) || !finiteInteger(augment.order, 1, 6)) return 'Invalid participant augment'
+        if (augmentIds.has(Number(augment.id)) || augmentOrders.has(Number(augment.order))) return 'Duplicate participant augment'
+        augmentIds.add(Number(augment.id)); augmentOrders.add(Number(augment.order))
+        if (typeof augment.name !== 'string' || !augment.name.trim() || augment.name.length > 100) return 'Invalid augment name'
+        if (!['kSilver','kGold','kPrismatic','kUnknown'].includes(augment.rarity)) return 'Invalid augment rarity'
+      }
+    }
     if (participant.gotFirstBlood === true) firstKillers += 1
     if (participant.wasFirstDeath === true) firstDeaths += 1
   }
@@ -70,6 +82,7 @@ function mergeRecords(existing, incoming) {
       wasFirstDeath: Boolean(previous.wasFirstDeath || participant.wasFirstDeath),
       pentakills: Math.max(Number(previous.pentakills || 0), Number(participant.pentakills || 0)),
       kills: previous.kills == null && participant.kills == null ? null : Math.max(Number(previous.kills || 0), Number(participant.kills || 0)),
+      augments: (participant.augments?.length || 0) >= (previous.augments?.length || 0) ? participant.augments : previous.augments,
       isLocalPlayer: false,
     })
   }
