@@ -1,4 +1,5 @@
 /.netlify/functions/* /.netlify/functions/:splat 200
 /api/upload/matches /.netlify/functions/first-blood-upload 200
+/api/upload/register /.netlify/functions/first-blood-register 200
 /api/players/:gameName /.netlify/functions/first-blood-player/:gameName 200
 /* /index.html 200
