@@ -1,6 +1,6 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
-const { mergeRecords, validateRecord } = require('../netlify/functions/first-blood-core.cjs')
+const { mergeRecords, normalizeAnonymousParticipants, validateRecord } = require('../netlify/functions/first-blood-core.cjs')
 
 const record = overrides => ({
   id:'5637955917', queueId:2400, createdAt:Date.now(), player:'Eriseths#NA1',
@@ -14,6 +14,16 @@ const record = overrides => ({
 test('accepts a well-formed Mayhem match', () => assert.equal(validateRecord(record()), null))
 test('rejects an untracked queue', () => assert.match(validateRecord(record({ queueId:450 })), /queue 2400/))
 test('rejects blank participant identities', () => assert.match(validateRecord(record({ participants:[{ name:'', champion:'Mel' }] })), /participant/i))
+test('accepts and labels anonymous participants without creating a shared identity', () => {
+  const value = record({ participants:[
+    ...record().participants,
+    { name:'Hidden Summoner', hasRiotId:false, participantId:3, champion:'Lux', kills:2, gotFirstBlood:false, wasFirstDeath:true },
+    { name:'Another Hidden Summoner', hasRiotId:false, participantId:4, champion:'Jinx', kills:4, gotFirstBlood:false, wasFirstDeath:false },
+  ] })
+  normalizeAnonymousParticipants(value)
+  assert.deepEqual(value.participants.slice(2).map(player=>player.name), ['Unknown Player 1','Unknown Player 2'])
+  assert.equal(validateRecord(value), null)
+})
 test('rejects multiple first-blood killers', () => {
   const participants = record().participants.map(player => ({ ...player, gotFirstBlood:true }))
   assert.match(validateRecord(record({ participants })), /first-blood/)

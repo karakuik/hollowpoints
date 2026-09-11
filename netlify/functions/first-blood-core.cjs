@@ -27,6 +27,15 @@ const validRiotId = value => {
   const separator = text.lastIndexOf('#')
   return separator > 0 && separator < text.length - 1 && text.length <= 80
 }
+
+function normalizeAnonymousParticipants(record) {
+  if (!record || !Array.isArray(record.participants)) return record
+  let anonymousCount = 0
+  record.participants = record.participants.map(participant => participant?.hasRiotId === false
+    ? { ...participant, name:`Unknown Player ${++anonymousCount}` }
+    : participant)
+  return record
+}
 const finiteInteger = (value, min, max) => Number.isInteger(Number(value)) && Number(value) >= min && Number(value) <= max
 
 function hashToken(token) {
@@ -60,8 +69,11 @@ function validateRecord(record) {
   let firstKillers = 0
   let firstDeaths = 0
   for (const participant of record.participants) {
-    if (!participant || typeof participant !== 'object' || !validRiotId(participant.name)) return 'Every participant must have a valid Riot ID'
-    const identity = riotIdKey(participant.name)
+    if (!participant || typeof participant !== 'object') return 'Invalid participant'
+    const anonymous = participant.hasRiotId === false
+    if (!anonymous && !validRiotId(participant.name)) return 'Every identified participant must have a valid Riot ID'
+    if (anonymous && !/^Unknown Player [1-9]\d*$/.test(String(participant.name || ''))) return 'Invalid anonymous participant'
+    const identity = anonymous ? `anonymous:${participant.participantId ?? participant.name}` : riotIdKey(participant.name)
     if (identities.has(identity)) return 'Duplicate participant Riot ID'
     identities.add(identity)
     if (typeof participant.champion !== 'string' || !participant.champion.trim() || participant.champion.length > 80) return 'Invalid participant champion'
@@ -93,7 +105,7 @@ function mergeRecords(existing, incoming) {
   const older = newer === incoming ? existing : incoming
   const players = new Map()
   for (const participant of [...(older.participants || []), ...(newer.participants || [])]) {
-    const identity = riotIdKey(participant.name)
+    const identity = participant.hasRiotId === false ? `anonymous:${participant.participantId ?? participant.name}` : riotIdKey(participant.name)
     if (!identity) continue
     const previous = players.get(identity) || {}
     players.set(identity, {
@@ -120,4 +132,4 @@ async function takeRateLimit(db, bucket, maximum, windowSeconds) {
   return data === true
 }
 
-module.exports = { bearerToken, clientIp, databaseOptions, hashToken, mergeRecords, riotIdKey, safeToken, takeRateLimit, validRiotId, validateRecord }
+module.exports = { bearerToken, clientIp, databaseOptions, hashToken, mergeRecords, normalizeAnonymousParticipants, riotIdKey, safeToken, takeRateLimit, validRiotId, validateRecord }

@@ -1,6 +1,6 @@
 const { createClient } = require('@supabase/supabase-js')
 const {
-  bearerToken, clientIp, databaseOptions, hashToken, mergeRecords, riotIdKey, safeToken,
+  bearerToken, clientIp, databaseOptions, hashToken, mergeRecords, normalizeAnonymousParticipants, riotIdKey, safeToken,
   takeRateLimit, validRiotId, validateRecord,
 } = require('./first-blood-core.cjs')
 
@@ -51,6 +51,7 @@ exports.handler = async event => {
 
   let record
   try { record=JSON.parse(event.body) } catch { return reply(400,{ error:'Invalid JSON' }) }
+  normalizeAnonymousParticipants(record)
   const validationError=validateRecord(record)
   if(validationError) return reply(400,{ error:validationError })
 
@@ -62,7 +63,7 @@ exports.handler = async event => {
   if(readError) return reply(500,{ error:'Could not check match' })
   const existing=old?.match_data
   const merged=mergeRecords(existing,record)
-  const participant_ids=[...new Set(merged.participants.map(p=>riotIdKey(p.name)).filter(validRiotId))]
+  const participant_ids=[...new Set(merged.participants.filter(p=>p.hasRiotId!==false&&validRiotId(p.name)).map(p=>riotIdKey(p.name)))]
   const uploader_ids=[...new Set([...(old?.uploader_ids||[]),uploader.id].filter(Boolean))]
   const matchRow={match_id:matchId,match_data:merged,participant_ids,game_created_at:Number(merged.createdAt),received_at:new Date().toISOString()}
   if(!uploader.legacy) matchRow.uploader_ids=uploader_ids
