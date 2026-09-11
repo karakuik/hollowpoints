@@ -1,7 +1,7 @@
 const crypto = require('node:crypto')
 const os = require('node:os')
 const { createClient } = require('@supabase/supabase-js')
-const { clientIp, hashToken, safeToken, takeRateLimit } = require('./first-blood-core.cjs')
+const { clientIp, databaseOptions, hashToken, safeToken, takeRateLimit } = require('./first-blood-core.cjs')
 
 const headers = { 'Content-Type':'application/json', 'X-Content-Type-Options':'nosniff', 'Cache-Control':'no-store' }
 const reply = (statusCode, body, extraHeaders = {}) => ({ statusCode, headers:{ ...headers, ...extraHeaders }, body:JSON.stringify(body) })
@@ -18,7 +18,7 @@ exports.handler = async event => {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(installId)) return reply(400, { error:'Invalid installation ID' })
   if (!label) return reply(400, { error:'Enter a name for this PC' })
 
-  const db = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, { auth:{ persistSession:false } })
+  const db = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, databaseOptions())
   const addressHash = hashToken(clientIp(event)).slice(0, 24)
   try {
     if (!await takeRateLimit(db, `register-hour:${addressHash}`, 10, 3600)) {

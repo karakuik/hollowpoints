@@ -1,5 +1,26 @@
 const crypto = require('node:crypto')
 
+const DATABASE_TIMEOUT_MS = 3500
+
+function databaseFetch(input, init = {}) {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(new Error('Database request timed out')), DATABASE_TIMEOUT_MS)
+  const sourceSignal = init.signal
+  const abort = () => controller.abort(sourceSignal.reason)
+  if (sourceSignal) {
+    if (sourceSignal.aborted) abort()
+    else sourceSignal.addEventListener('abort', abort, { once:true })
+  }
+  return fetch(input, { ...init, signal:controller.signal }).finally(() => {
+    clearTimeout(timer)
+    sourceSignal?.removeEventListener('abort', abort)
+  })
+}
+
+function databaseOptions() {
+  return { auth:{ persistSession:false }, global:{ fetch:databaseFetch } }
+}
+
 const riotIdKey = value => String(value || '').normalize('NFKC').replace(/\s*#\s*/, '#').trim().toLowerCase()
 const validRiotId = value => {
   const text = String(value || '').trim()
@@ -99,4 +120,4 @@ async function takeRateLimit(db, bucket, maximum, windowSeconds) {
   return data === true
 }
 
-module.exports = { bearerToken, clientIp, hashToken, mergeRecords, riotIdKey, safeToken, takeRateLimit, validRiotId, validateRecord }
+module.exports = { bearerToken, clientIp, databaseOptions, hashToken, mergeRecords, riotIdKey, safeToken, takeRateLimit, validRiotId, validateRecord }

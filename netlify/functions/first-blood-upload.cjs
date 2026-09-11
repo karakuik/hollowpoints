@@ -1,6 +1,6 @@
 const { createClient } = require('@supabase/supabase-js')
 const {
-  bearerToken, clientIp, hashToken, mergeRecords, riotIdKey, safeToken,
+  bearerToken, clientIp, databaseOptions, hashToken, mergeRecords, riotIdKey, safeToken,
   takeRateLimit, validRiotId, validateRecord,
 } = require('./first-blood-core.cjs')
 
@@ -28,7 +28,7 @@ exports.handler = async event => {
   if (event.httpMethod !== 'POST') return reply(405, { error:'Method not allowed' }, { Allow:'POST' })
   if (Buffer.byteLength(event.body || '', 'utf8') > MAX_BODY_BYTES) return reply(413, { error:'Match record is too large' })
 
-  const db=createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_KEY,{ auth:{ persistSession:false } })
+  const db=createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_KEY,databaseOptions())
   let uploader
   try { uploader=await authenticate(db,event) }
   catch(error) { console.error('Uploader authentication failed',error); return reply(500,{ error:'Upload service unavailable' }) }
@@ -56,7 +56,9 @@ exports.handler = async event => {
 
   const matchId=String(record.id), payloadHash=hashToken(event.body)
   const existingColumns=uploader.legacy?'match_data':'match_data,uploader_ids'
-  const { data:old,error:readError }=await db.from('first_blood_matches').select(existingColumns).eq('match_id',matchId).maybeSingle()
+  let old,readError
+  try { ({data:old,error:readError}=await db.from('first_blood_matches').select(existingColumns).eq('match_id',matchId).maybeSingle()) }
+  catch(error) { console.error('Match lookup failed',error); return reply(503,{ error:'Upload service temporarily unavailable' }) }
   if(readError) return reply(500,{ error:'Could not check match' })
   const existing=old?.match_data
   const merged=mergeRecords(existing,record)
@@ -64,12 +66,20 @@ exports.handler = async event => {
   const uploader_ids=[...new Set([...(old?.uploader_ids||[]),uploader.id].filter(Boolean))]
   const matchRow={match_id:matchId,match_data:merged,participant_ids,game_created_at:Number(merged.createdAt),received_at:new Date().toISOString()}
   if(!uploader.legacy) matchRow.uploader_ids=uploader_ids
-  const { error }=await db.from('first_blood_matches').upsert(matchRow)
+  let error
+  try { ({error}=await db.from('first_blood_matches').upsert(matchRow)) }
+  catch(saveError) { console.error('Match save failed',saveError); return reply(503,{ error:'Upload service temporarily unavailable' }) }
   if(error) return reply(500,{ error:'Could not save match' })
 
-  if(uploader.id) await Promise.all([
-    db.from('first_blood_upload_receipts').upsert({match_id:matchId,uploader_id:uploader.id,payload_hash:payloadHash,received_at:new Date().toISOString()}),
-    db.from('first_blood_uploaders').update({last_seen_at:new Date().toISOString()}).eq('id',uploader.id),
-  ])
+  if(uploader.id) {
+    const results=await Promise.allSettled([
+      db.from('first_blood_upload_receipts').upsert({match_id:matchId,uploader_id:uploader.id,payload_hash:payloadHash,received_at:new Date().toISOString()}),
+      db.from('first_blood_uploaders').update({last_seen_at:new Date().toISOString()}).eq('id',uploader.id),
+    ])
+    results.forEach(result=>{
+      if(result.status==='rejected') console.error('Upload bookkeeping failed',result.reason)
+      else if(result.value.error) console.error('Upload bookkeeping failed',result.value.error)
+    })
+  }
   return reply(existing?200:201,{ok:true,created:!existing,matchId,registered:!uploader.legacy,verifiedSubmissions:uploader_ids.length})
 }
