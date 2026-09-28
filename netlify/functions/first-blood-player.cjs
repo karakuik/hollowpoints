@@ -1,5 +1,5 @@
 const { createClient } = require('@supabase/supabase-js')
-const { clientIp, databaseOptions, hashToken, takeRateLimit } = require('./first-blood-core.cjs')
+const { clientIp, databaseOptions, hashToken, publicParticipant, takeRateLimit } = require('./first-blood-core.cjs')
 const headers={ 'Content-Type':'application/json','Cache-Control':'public, max-age=15' }
 const reply=(statusCode,body)=>({statusCode,headers,body:JSON.stringify(body)})
 exports.handler=async event=>{
@@ -16,7 +16,7 @@ exports.handler=async event=>{
   try { ({data,error}=await db.from('first_blood_matches').select('match_id,game_created_at,participants:match_data->participants').contains('participant_ids',[identity]).order('game_created_at',{ascending:false}).limit(1000)) }
   catch(loadError) { console.error('Player history lookup failed',loadError); return reply(503,{error:'Player service temporarily unavailable; try again shortly'}) }
   if(error) return reply(503,{error:'Could not load player history; try again shortly'})
-  const matches=(data||[]).map(row=>({id:row.match_id,createdAt:new Date(row.game_created_at).getTime(),participants:row.participants||[]}))
+  const matches=(data||[]).map(row=>({id:row.match_id,createdAt:new Date(row.game_created_at).getTime(),participants:(row.participants||[]).map(publicParticipant)}))
   const actual=matches.flatMap(m=>m.participants||[]).find(p=>String(p.name||'').normalize('NFKC').toLowerCase()===identity)?.name||riotId
   return reply(200,{player:{riotId:actual,gameName:actual.split('#')[0],tagLine:actual.split('#').slice(1).join('#')},matches,matchCount:matches.length})
 }

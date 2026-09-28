@@ -1,6 +1,6 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
-const { mergeRecords, normalizeAnonymousParticipants, validateRecord } = require('../netlify/functions/first-blood-core.cjs')
+const { mergeRecords, normalizeAnonymousParticipants, publicParticipant, validateRecord } = require('../netlify/functions/first-blood-core.cjs')
 
 const record = overrides => ({
   id:'5637955917', queueId:2400, createdAt:Date.now(), player:'Eriseths#NA1',
@@ -23,6 +23,19 @@ test('accepts and labels anonymous participants without creating a shared identi
   normalizeAnonymousParticipants(value)
   assert.deepEqual(value.participants.slice(2).map(player=>player.name), ['Unknown Player 1','Unknown Player 2'])
   assert.equal(validateRecord(value), null)
+})
+test('browser participant records retain statistics but omit unused raw game data', () => {
+  const participant = publicParticipant({
+    name:'Eriseths#NA1', hasRiotId:true, champion:'Zilean', team:'ORDER', kills:12,
+    pentakills:1, gotFirstBlood:true, wasFirstDeath:false, won:true,
+    augments:[{id:101,order:1,name:'Test Augment',rarity:'kGold',icon:'101.png'}],
+    items:[{itemID:3089}], runes:{primaryRuneTree:{displayName:'Sorcery'}}, scores:{assists:20},
+  })
+  assert.equal(participant.kills, 12)
+  assert.equal(participant.augments[0].name, 'Test Augment')
+  assert.equal('items' in participant, false)
+  assert.equal('runes' in participant, false)
+  assert.equal('scores' in participant, false)
 })
 test('rejects multiple first-blood killers', () => {
   const participants = record().participants.map(player => ({ ...player, gotFirstBlood:true }))

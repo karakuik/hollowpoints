@@ -36,6 +36,27 @@ function normalizeAnonymousParticipants(record) {
     : participant)
   return record
 }
+
+function publicParticipant(participant = {}) {
+  return {
+    name:String(participant.name || ''),
+    hasRiotId:participant.hasRiotId !== false,
+    champion:String(participant.champion || 'Unknown'),
+    team:participant.team || null,
+    kills:participant.kills == null ? null : Number(participant.kills),
+    pentakills:Number(participant.pentakills || 0),
+    gotFirstBlood:participant.gotFirstBlood === true,
+    wasFirstDeath:participant.wasFirstDeath === true,
+    won:typeof participant.won === 'boolean' ? participant.won : null,
+    augments:Array.isArray(participant.augments) ? participant.augments.map(augment => ({
+      id:Number(augment.id),
+      order:Number(augment.order),
+      name:String(augment.name || `Augment ${augment.id}`),
+      rarity:String(augment.rarity || 'kUnknown'),
+      icon:String(augment.icon || `${augment.id}.png`),
+    })) : [],
+  }
+}
 const finiteInteger = (value, min, max) => Number.isInteger(Number(value)) && Number(value) >= min && Number(value) <= max
 
 function hashToken(token) {
@@ -132,4 +153,4 @@ async function takeRateLimit(db, bucket, maximum, windowSeconds) {
   return data === true
 }
 
-module.exports = { bearerToken, clientIp, databaseOptions, hashToken, mergeRecords, normalizeAnonymousParticipants, riotIdKey, safeToken, takeRateLimit, validRiotId, validateRecord }
+module.exports = { bearerToken, clientIp, databaseOptions, hashToken, mergeRecords, normalizeAnonymousParticipants, publicParticipant, riotIdKey, safeToken, takeRateLimit, validRiotId, validateRecord }
