@@ -60,19 +60,18 @@ gold/silver/copper coin swatches — instead of plain `Xg Ys Zc` text.
 **Why a backend function at all:** Blizzard's Game Data API auction
 endpoints require an OAuth2 Client Credentials token (Client ID + Secret
 from [develop.battle.net](https://develop.battle.net/)). The secret can
-never reach the browser, so `wow-auctions.js` holds it server-side, does the
+never reach the browser, so `wow-auctions.cjs` holds it server-side, does the
 token exchange, and proxies just the prices the frontend asks for. Same
 pattern the site already used for the Steam API key in
-`netlify/functions/steam.js`.
+`netlify/functions/steam.cjs`.
 
 Netlify's function runtime enforces the repo's root `"type": "module"` the
 same way Node does locally — a plain `.js` file using `exports.handler =`
 throws `ReferenceError: module is not defined` in production. Both
-`wow-auctions.js` and the pre-existing `steam.js` hit this; `wow-auctions`
-was fixed by renaming to `.cjs` (always CommonJS regardless of
+`wow-auctions.js` and the pre-existing `steam.js` hit this; both functions
+were fixed by renaming to `.cjs` (always CommonJS regardless of
 `package.json`, and Netlify strips the extension for the function's URL
-either way). `steam.js` still has the bug as of this writing — the Now
-page's Steam widget is 502ing in production, unrelated to this feature.
+either way). `steam.cjs` now uses the CommonJS extension expected by Netlify.
 
 **Sync flow:** the page reads `WOW_ITEM_IDS`, builds a comma-separated list
 of every mapped item ID, and calls
@@ -170,9 +169,8 @@ That leaves 79 real recipes, all present in the tracker.
 - [ ] **Rotate the Blizzard client secret** if it was ever pasted into a
       chat session — regenerate on develop.battle.net so the old one stops
       being valid.
-- [ ] **Fix `steam.js`** — same `.js` → `.cjs` fix that resolved
-      `wow-auctions.js`'s production crash. Separate from this feature but
-      currently broken (502) on the live site.
+- [x] **Fix `steam.cjs`** — same `.js` → `.cjs` fix that resolved
+      `wow-auctions.cjs`'s production crash.
 - [ ] **Map item IDs for sellable crafted outputs** (62 recipes currently
       have `sellable: true` but no resolved item ID for their own output) —
       needed for the "Recommended right now" section to populate itself
